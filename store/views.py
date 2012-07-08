@@ -12,3 +12,7 @@ def auth():
   else: 
     return False
 
+@app.route("/")
+def initial():
+  return render_template('coming_soon.html')
+
