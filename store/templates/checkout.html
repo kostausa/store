@@ -1,0 +1,164 @@
+{% extends 'layout.html' %}
+{% block css %}
+{% endblock %}
+
+{% block menu %}
+<ul class="nav nav-tabs nav-stacked">
+  <li><a href="/store/{{conf.path}}">강의/설교 리스트</a></li>
+  <li><a href="/store/{{conf.path}}/points">포인트 충전/관리</a></li>
+  <li><a href="/store/{{conf.path}}/info">질문/연락</a></li>
+</ul>
+{% endblock %}
+
+{% block body %}
+
+<div class="conf">
+  {{ conf.name }} Conference
+</div>
+
+<div style="margin-top:20px;padding-left:20px;">
+
+<div class="sub">
+카드결제 : <span class="red">${{amount}}</span>
+</div>
+
+<form action="/store/swipe" method="POST" id="payment-form">
+<input type="hidden" name="conf" value="{{conf.path}}">
+<input type="hidden" name="amount" value="{{amount}}00">
+<input type="hidden" id="stripeToken" name="stripeToken" value="">
+ <div class="form-row">
+  <label>Name ( 카드에 나온 )</label>
+  <input type="text" autocomplete="off" class="span3 card-name"/>
+ </div>
+ <div class="form-row">
+  <label>Card Number</label>
+  <input type="text" autocomplete="off" class="span3 card-number"/>
+ </div>
+ <div class="form-row">
+   <label>CVC</label>
+   <input type="text" size="4" autocomplete="off" class="card-cvc"/>
+</div>
+<div class="form-row">
+  <label>Expiration (MM/YYYY)</label>
+  <input type="text" size="2" class="card-expiry-month input-small"/>
+  <span> / </span>
+  <input type="text" size="4" class="card-expiry-year input-small"/>
+</div>
+<div style="margin-top:20px;">
+
+<div class="row">
+  <div class="hide alert alert-danger errmsg span3"></div>
+</div>  
+  <button type="submit" id="pay" data-loading-text="결제중" class="btn btn-primary btn-large">카드결제하기</button>
+</div>
+</form>
+
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript" src="https://js.stripe.com/v1/"></script>
+<script type="text/javascript">
+  var Store = {};
+  Store.checkout = (function() {
+
+    var token = {
+      "id"  : undefined,
+      "validate" : function() {
+        var number = $('.card-number').val();
+        var cvc = $('.card-cvc').val();
+        var exp_month = $('.card-expiry-month').val();
+        var exp_year = $('.card-expiry-year').val();
+        var name = $('.card-name').val();
+
+        if (/^[0-9]+$/.test(number) === false) {
+          return false;
+        }
+
+        if (/^[0-9]{2}$/.test(exp_month) === false) {
+          return false;
+        }
+
+        if (/^[0-9]{4}$/.test(exp_year) === false) {
+          return false;
+        }
+
+        if (name.length < 2) {
+          return false;
+        }
+
+        return true;
+      },
+      "get" : function() {
+
+        if (this.validate() === false) {
+          token.error('validation');
+          return false;
+        }
+
+        $('button[type=submit]').button('loading');
+
+        Stripe.createToken({
+          number: $('.card-number').val(),
+          cvc: $('.card-cvc').val(),
+          exp_month: $('.card-expiry-month').val(),
+          exp_year: $('.card-expiry-year').val(),
+          name: $('.card-name').val()
+        }, this.handler);
+
+        return false;
+      },
+      "error": function(type) {
+        var msg = '';
+        switch (type) {
+          case 'validation':
+            msg = '입력하신 정보가 올바르지 않습니다.';
+            break;
+          case 'invalid_number':
+            msg = '카드번호가 유효하지 않습니다';
+            break;
+
+          default:
+            msg = '카드결제에 오류가 있었습니다 (금액을 Charge 하지 않았습니다).';
+            break;
+        }
+        $('button[type=submit]').button('reset');
+        $('.errmsg').html(msg).fadeIn('fast');
+        setTimeout(function() {
+          $('.errmsg').fadeOut('fast');
+        }, 4000);
+      },
+      "handler" : function(status, response) {
+        if (status != 200 || !('id' in response) || response.error) {
+          token.error(response.error.code);
+          return false;
+        }
+
+        token.id = response.id;
+        $('#stripeToken').val(response.id);
+        console.log('response.token ' + response.id);
+        $('#payment-form').submit();
+      } 
+    };
+
+    return {
+      "setup" : function() {
+        Stripe.setPublishableKey('pk_QW1ledt2oHZGEL9i0b1HJzLeeQ5B1');
+
+        $('#payment-form').submit(function(e) {
+          if (token.id === undefined) {
+            token.get();
+            return false;
+          }
+        });
+      }
+    }
+  })();
+</script>
+{% endblock %}
+
+
+{% block setupjs %}
+Store.checkout.setup();
+{% endblock %}

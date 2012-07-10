@@ -1,0 +1,131 @@
+{% extends 'layout.html' %}
+{% block css %}
+{% endblock %}
+
+{% block body %}
+
+<div class="conf">
+  {{ conf.name }} Conference
+</div>
+
+{% if error %}
+<div class="row-fluid">
+  <div class="alert alert-danger span10">
+    <strong>새로 등록을 할수 없었습니다.</strong>
+    {% if reason == 'exists' %}
+      {{ email }} 으로 이미 계정이 등록되어 있습니다. 
+    {% else %}
+      등록에 오류가 있었습니다. 
+    {% endif %}
+  </div>
+</div>
+<a href="/store/{{conf.path}}/newmember" class="btn">돌아가기</a>
+{% elif done %}
+<div class="row-fluid">
+  <div class="alert alert-success span5">
+    <strong>성공적으로 계정을 만들었습니다.</strong>
+    <div>
+      {{user.name}} <u>{{user.email}}</u>
+    </div>
+  </div>
+</div>
+<a href="/store/{{conf.path}}" class="btn">온라인 스토어에 들어가기</a>
+{% else %}
+<form class="form-horizontal" id="newmember-form" action="newmember" method="POST">
+  <input type="hidden" name="confcode" value="{{conf.code}}">
+  <fieldset>
+    <legend>
+      <div style="color:#269;">
+        새로 계정 만들기
+      </div>
+    </legend>
+    <div class="control-group">
+      <label class="control-label" for="name">한글이름</label>
+      <div class="controls">
+        <input type="text" class="input-xlarge" name="name" id="name">
+      </div>
+    </div>
+
+    <div class="control-group">
+      <label class="control-label" for="email">이메일</label>
+      <div class="controls">
+        <input type="text" class="input-xlarge" name="email" id="email">
+      </div>
+    </div>
+
+    <div class="control-group">
+      <label class="control-label" for="pass">패스워드</label>
+      <div class="controls">
+        <input type="password" class="input-xlarge" name="pass" id="pass">
+      </div>
+    </div>
+
+    <div class="control-group">
+      <label class="control-label" for="confirm">패스워드 확인</label>
+      <div class="controls">
+        <input type="password" class="input-xlarge" name="confirm" id="confirm">
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">신청하기</button>
+      <a href="/store/{{conf.path}}" class="btn">Cancel</a>      
+    </div>
+
+  </fieldset>
+</form>
+{% endif %}
+
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+var Store = {};
+Store.newmember = (function() {
+
+  var form = {
+    "email": function(email) {
+      var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return re.test(email);
+    },
+    "validate": function() {
+      var fields = [ 'name', 'email', 'pass', 'confirm' ];
+      for (var i in fields) {
+        var item = fields[i];
+        if ($('#'+item).val() == '') {
+          return false;
+        }
+      }
+      if (!this.email($('#email').val())) {
+        return false;
+      }
+
+      if ($('#pass').val() !== $('#confirm').val()) {
+        return false;
+      }
+
+      return true;
+    }
+  };
+
+  return {
+    "setup" : function() {
+
+      $('button[type=submit]').on('click', function(e) {
+        e.preventDefault();
+        if (form.validate()) {
+          $('#newmember-form').submit();
+        } else {
+          alert('등록 정보를 올바르게 입력해 주세요');
+        }
+      });
+
+    }
+  }
+})();
+</script>
+{% endblock %}
+
+{% block setupjs %}
+Store.newmember.setup();
+{% endblock %}

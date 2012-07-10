@@ -1,0 +1,34 @@
+{% extends 'layout.html' %}
+{% block css %}
+{% endblock %}
+
+{% block menu %}
+<div class="remains">
+  <i class="icon-signal"></i> 
+  {% if credit.unlimited %}
+  무제한
+  {% else %}
+  {{ credit.total }} 포인트
+  {% endif %}
+</div>
+
+<ul class="nav nav-tabs nav-stacked">
+  <li><a href="/store/{{conf.path}}">강의/설교 리스트</a></li>
+  <li><a href="/store/{{conf.path}}/points">포인트 충전/관리</a></li>
+  <li class="active"><a href="/store/{{conf.path}}/info">질문/연락</a></li>
+</ul>
+{% endblock %}
+
+{% block body %}
+
+<div class="conf">
+  {{ conf.name }} Conference
+</div>
+
+<div class="pull-right">
+  {{user.name}} {{user.email}} | <a href="/store/{{conf.path}}/logout">logout</a>
+</div>
+
+
+
+{% endblock %}

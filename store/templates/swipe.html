@@ -1,0 +1,59 @@
+{% extends 'layout.html' %}
+{% block css %}
+{% endblock %}
+
+{% block menu %}
+<ul class="nav nav-tabs nav-stacked">
+  <li><a href="/store/{{conf.path}}">강의/설교 리스트</a></li>
+  <li><a href="/store/{{conf.path}}/points">포인트 충전/관리</a></li>
+  <li><a href="/store/{{conf.path}}/info">질문/연락</a></li>
+</ul>
+{% endblock %}
+
+{% block body %}
+
+
+{% if result %}
+결제를 성공적으로 마쳤습니다. 
+
+<div class="margin-top:30px;">
+<div class="sub">영수증</div>
+
+<table class="table table-condensed table-striped">
+<tbody>
+  <tr>
+    <td>내용</td>
+    <td>KOSTA/USA Online Store - {{conf.name}} Conference</td>
+  </tr>
+  <tr>
+    <td>결제금액</td>
+    <td>${{ amount }}.00</td>
+  </tr>
+  <tr>
+    <td>시간</td>
+    <td>{{ ts }}</td>
+  </tr>
+  <tr>
+    <td>결제번호</td>
+    <td>{{ id }}</td>
+  </tr>
+  <tr>
+    <td>*</td>
+    <td>{{ amount }} 포인트가 성공적으로 추가되었습니다</td>
+  </tr>
+</tbody>
+</table>
+
+<div class="section">
+  <a class="btn" href="/store/{{conf.path}}/points">포인트 충전/관리로 돌아가기</a>
+</div>
+
+
+{% else %}
+
+  결제 과정에서 오류가 있었습니다. <a href="/store/{{conf.path}}/points">다시한번 시도</a>해 주세요. 
+
+{% endif %}
+
+
+{% endblock %}

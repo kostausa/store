@@ -1,0 +1,21 @@
+{% extends 'layout.html' %}
+{% block css %}
+{% endblock %}
+
+{% block body %}
+
+<div class="conf">
+  {{ conf.name }} Conference
+</div>
+
+<form class="well form-inline">
+  <input type="text" class="input-medium" placeholder="Email">
+  <input type="password" class="input-small" placeholder="Password">
+  <button type="submit" class="btn btn-info">로그인</button>
+  <div class="pull-right newmember">
+    <a href="newmember">아직 계정이 없습니다 &mdash; 가입하기</a>
+  </div>
+</form>
+
+
+{% endblock %}

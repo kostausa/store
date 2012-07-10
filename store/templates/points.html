@@ -1,0 +1,157 @@
+{% extends 'layout.html' %}
+{% block css %}
+{% endblock %}
+
+{% block menu %}
+<div class="remains">
+  <i class="icon-signal"></i> 
+  {% if credit.unlimited %}
+  무제한
+  {% else %}
+  {{ credit.total }} 포인트
+  {% endif %}
+</div>
+
+<ul class="nav nav-tabs nav-stacked">
+  <li><a href="/store/{{conf.path}}">강의/설교 리스트</a></li>
+  <li class="active"><a href="/store/{{conf.path}}/points">포인트 충전/관리</a></li>
+  <li><a href="/store/{{conf.path}}/info">질문/연락</a></li>
+</ul>
+{% endblock %}
+
+{% block body %}
+
+<div class="conf">
+  {{ conf.name }} Conference
+</div>
+
+<div class="pull-right">
+  {{user.name}} {{user.email}} | <a href="/store/{{conf.path}}/logout">logout</a>
+</div>
+
+<div class="inner">
+
+<div class="section">
+  <div class="sub">
+  현재 포인트  
+    {% if credit.unlimited %}
+      <span class="credit">Unlimited</span>
+    {% else %}
+      <span class="credit">{{ credit.total }} Points</span>
+    {% endif %}
+  </div>
+
+  <div class="history">
+    사용내역
+    {% for log in logs %}
+      <div class="log">
+      {% if log.type == 'gift' %}
+        {{ log.created }} &mdash;
+        <span class="gift">Gift Code</span>&nbsp;&nbsp;
+        {{ log.detail }}  <span class="red">+{{ log.point }}</span> points
+      {% elif log.type == 'purchase' %}
+        {{ log.created }} &mdash;
+        <span class="gift">Purchase</span>&nbsp;&nbsp;
+        ${{ log.point }} 크레딧 카드 결제 <span class="red">+{{ log.point }}</span> points    
+      {% endif %}
+      </div>
+
+    {% endfor %}
+  </div>
+
+</div>
+
+
+
+<div class="section">
+
+  <div class="sub">
+  포인트 충전
+  </div>
+  {% if choices.fullupgrade == 0 %}
+  무제한 다운로드 하실 수 있습니다. 충전이 더 필요하지 않습니다. 
+  {% else %}
+    <table class="table table-striped table-condensed">
+    <thead>
+      <th>포인트</th>
+      <th>가격</th>
+      <th>설명</th>
+      <th>결제하기 (Visa, Master Card)</th>
+    </thead>
+    <tbody>
+    {% for option in choices.option %}
+      <tr>
+        <td>{{ option }} Point</td>
+        <td>${{ option }}</td>
+        <td>{{ option }}개 다운로드</td>
+        <td><a href="/store/{{conf.path}}/checkout/{{option}}" class="btn btn-mini btn-info">${{ option }} - Buy</a></td>
+      </tr>
+    {% endfor %}
+
+    {% if choices.fullupgrade > 0 %}
+      <tr>
+        <td>{{ choices.fullupgrade }} Point</td>
+        <td>${{ choices.fullupgrade }}</td>
+        <td>무제한 다운로드로 전환하기</td>
+        <td><a href="/store/{{conf.path}}/checkout/{{ choices.fullupgrade }}" class="btn btn-mini btn-success">${{ choices.fullupgrade }} - 무제한 다운로드로 전환</a></td>
+      </tr>
+    {% endif %}
+    </tbody>
+    </table>
+  {% endif %}
+</div>
+
+<div class="section">
+
+  <div class="sub">
+  선물코드 Redeem
+  </div>
+
+  {% if error %}
+  <div class="row-fluid">
+    <div class="span5 alert alert-danger">
+      {% if error == 'notfound' %}
+      유효하지 않은 선물코드 입니다. 
+      {% elif error == 'already' %}
+      이미 사용중인 선물코드 입니다. 
+      {% endif %}
+    </div>
+  </div>  
+  {% endif %}
+
+  {% if choices.fullupgrade == 0 %}
+  무제한 다운로드 하실 수 있습니다. 선물카드 적용이 더 필요하지 않습니다. 
+  {% else %}
+  <form class="form-horizontal" method="POST" action="/store/{{conf.path}}/redeem">
+    <input type="text" class="input-mini" maxlength="4" name="giftcode1"> &mdash;
+    <input type="text" class="input-mini" name="giftcode2"> &mdash;
+    <input type="text" class="input-mini" name="giftcode3"> &mdash;
+    <input type="text" class="input-mini" name="giftcode4">
+    <button class="btn btn-primary" style="margin-left:20px;">적용하기</button>
+  </form>
+  {% endif %}
+</div>
+
+</div>
+
+
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+var Store = {};
+Store.points = (function() {
+  return {
+    "setup" : function() {
+      setTimeout(function() {
+        $('.alert').fadeOut('slow');
+      }, 4000);
+    } 
+  };
+})();
+</script>
+{% endblock %}
+
+{% block setupjs %}
+Store.points.setup();
+{% endblock %}
