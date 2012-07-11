@@ -109,7 +109,7 @@ def admin():
   conf = session['conf']
   recordings = Recording.query \
     .filter_by(conf=conf) \
-    .order_by(Recording.filename)
+    .order_by(Recording.id)
 
   return render_template("admin/main.html", conf=conf, recordings=recordings)
 

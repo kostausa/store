@@ -33,15 +33,18 @@
 
 <div class="listing">
 <h3>세미나 리스트</h3>
-<table class="table table-condensed table-striped" style="width:70%;">
+<table class="table table-condensed table-striped">
 <tbody>
 {% for recording in recordings %}
   <tr>
     <td>
       <a href="#" class="title">{{recording.title}}</a> 
     </td>
-    <td>
+    <td style="width:110px;">
       {{ recording.speaker }}
+    </td>
+    <td style="width:200px;text-align:right;">
+      &nbsp;-
     </td>
   </tr>
 {% endfor %}
