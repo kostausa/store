@@ -1,0 +1,88 @@
+{% extends 'layout.html' %}
+{% block css %}
+<link rel="stylesheet" href="/static/css/admin.css" type="text/css" />
+{% endblock %}
+
+{% block menu %}
+<div class="choices">
+  <div style="margin-bottom:3px;">
+    <a href="/store/admin/choose/0"{% if conf == 0 %} class="active"{% endif %}>시카고</a>
+  </div>
+  <div>
+    <a href="/store/admin/choose/1"{% if conf == 1 %} class="active"{% endif %}>인디애나폴리스</a>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block body %}
+
+<div style="margin-bottom:20px">{% if conf == 0 %}시카고{% else %}인디{% endif %} 컨퍼런스</div>
+
+<div class="sub">
+입력하기 - 
+</div>
+
+<form action="/store/admin/remove" method="POST" id="removeform">
+  <input type="hidden" name="id" id="removeid" value="">
+</form>
+
+<form action="/store/admin/add" method="POST">
+
+  <input type="hidden" name="conf" value="{{conf}}">
+
+  <select name="type">
+    <option value="1">전체집회 설교</option>
+    <option value="2">세미나 강의</option>
+    <option value="3">간증</option>
+    <option value="4">JJ 수양회</option>
+  </select>
+
+  <div style="margin-left:20px;">
+
+    <div class="row">
+      <input type="text" class="span5" name="title" placeholder="제목">
+      <input type="text" class="span5" name="speaker" placeholder="강사">
+      <input type="text" class="span5" name="file" placeholder="녹음파일">
+      <input type="text" class="span5" name="ppt" placeholder="PPT파일">
+      <textarea name="desc" class="span10" style="height:100px;" placeholder="설명"></textarea>
+    </div>
+
+  </div>
+
+  <button class="btn btn-primary btn-large"><i class="icon-chevron-right icon-white"></i> 입력하기</button>
+</form>
+
+<table class="table table-condensed table-striped">
+<thead>
+  <tr>
+    <th>파일</th>
+    <th>분류</th>
+    <th>강의</th>
+    <th>관리</th>
+  </tr>
+</thead>
+<tbody>
+{% for recording in recordings %}
+<tr>
+  <td>{{recording.filename}}</td>
+  <td>{{recording.category.description}}</td>
+  <td>{{ recording.title }} - {{ recording.speaker }}</td>
+  <td><a href="#{{ recording.id }}" class="remove btn btn-mini">remove</a></td>
+</tr>
+{% endfor %}
+</table>
+
+{% endblock %}
+
+{% block setupjs %}
+
+$('.remove').click(function(e) {
+  e.preventDefault();
+  var target = e.target;
+  var ids = $(e.target).attr('href').split('#');
+  $('#removeid').val(ids[1]);
+  $('#removeform').submit();
+});
+
+{% endblock %}

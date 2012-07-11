@@ -21,14 +21,6 @@ class User(db.Model):
     self.password = password
     self.conf = conf
 
-class Recording(db.Model):
-  id = db.Column(db.Integer, primary_key=True)
-  bucket = db.Column(db.String(255), unique=False)
-  filename = db.Column(db.String(255), unique=True)
-  title = db.Column(db.Text, unique=True)
-  speaker = db.Column(db.String(255), unique=False)
-  conf = db.Column(db.Integer)
-
 class Code(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   code = db.Column(db.String(255), unique=False)
@@ -52,6 +44,30 @@ class History(db.Model):
     self.detail = detail
     self.created = datetime.datetime.now()
 
+class Recording(db.Model):
+  id = db.Column(db.Integer, primary_key=True)
+  bucket = db.Column(db.String(255), unique=False)
+  filename = db.Column(db.String(255), unique=True)
+  title = db.Column(db.Text, unique=True)
+  speaker = db.Column(db.String(255), unique=False)
+  conf = db.Column(db.Integer)
+  ppt = db.Column(db.String(255))
+  categoryid = db.Column(db.Integer, db.ForeignKey('category.id'))
+
+  def __init__(self, bucket, filename, title, speaker, conf, ppt, recordtype):
+    self.bucket = bucket
+    self.filename = filename
+    self.title = title
+    self.speaker = speaker
+    self.conf = conf
+    self.ppt = ppt
+    self.categoryid = recordtype
+
+class Category(db.Model):
+  id = db.Column(db.Integer, primary_key=True)
+  description = db.Column(db.String(255), unique=True)
+  recording = db.relationship('Recording', backref='category')
+
 def makeconf(conf):
   conference = {}
   if conf == 'chicago':
@@ -72,6 +88,87 @@ def auth():
     return True
   else: 
     return False
+
+
+def authadmin():
+  if 'admin' in session and session['admin']:
+    return True
+  else:
+    return False
+
+@app.route("/store/admin")
+def admin():
+  if not authadmin():
+    return redirect("/store/admin/login")
+  
+  if not 'conf' in session:
+    session['conf'] = 0
+
+  conf = session['conf']
+  recordings = Recording.query \
+    .filter_by(conf=conf) \
+    .order_by(Recording.filename)
+
+  return render_template("admin/main.html", conf=conf, recordings=recordings)
+
+@app.route("/store/admin/remove", methods=["POST"])
+def remove_recording():
+  if not authadmin():
+    return redirect("/store/admin/login")
+
+  id = int(request.form['id'])
+  recording = Recording.query.filter_by(id=id).first()
+  if not recording is None:
+    db.session.delete(recording)
+    db.session.commit()
+
+  return redirect("/store/admin")
+
+@app.route("/store/admin/add", methods=["POST"])
+def add_recording():
+  if not authadmin():
+    return redirect("/store/admin/login")
+
+  recordtype = request.form['type']    
+  title = request.form['title']
+  speaker = request.form['speaker']
+  filename = request.form['file']
+  ppt = request.form['ppt']
+  desc = request.form['desc']
+  conf = int(request.form['conf'])
+
+  bucket = '2012-chicago'
+  if conf == 1:
+    bucket = '2012-indy'
+
+  recording = Recording(bucket, filename, title, speaker, conf, ppt, recordtype)
+  db.session.add(recording)
+  db.session.commit()
+
+  return redirect("/store/admin")
+
+
+@app.route("/store/admin/choose/<conf>")
+def choose(conf):
+  session['conf'] = int(conf)
+  return redirect("/store/admin")
+
+@app.route("/store/admin/login", methods=["GET", "POST"])
+def adminlogin():
+  if request.method == "GET":
+    return render_template("admin/login.html", autherror=False)
+
+  user = request.form["user"]
+  passwd = request.form["pass"]
+
+  if user == "store" and passwd == "gkskslaskfk":
+    session['admin'] = True
+    return redirect("/store/admin")
+
+  return render_template("admin/login.html", autherror=True)
+
+
+
 
 @app.route("/store/<conf>/newmember", methods=['GET', 'POST'])
 def newmember(conf):

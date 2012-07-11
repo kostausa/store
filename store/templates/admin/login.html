@@ -1,0 +1,19 @@
+{% extends 'layout.html' %}
+{% block css %}
+{% endblock %}
+
+{% block body %}
+관리자 로그인
+
+<form action="/store/admin/login" method="POST" class="form-inline">
+
+  {% if autherror %}
+  <div class="red">잘못된 로그인 입니다</div>
+  {% endif %}
+  <input type="text" name="user" class="input-small">
+  <input type="password" name="pass" class="input-small">
+  <button class="btn" type="submit" data-loading-text="logging in...">로그인</button>
+
+</form>
+
+{% endblock %}

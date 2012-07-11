@@ -1,0 +1,16 @@
+.choices a {
+  color:#777;
+  text-decoration:underline;
+  margin-bottom:3px;
+}
+.choices a.active {
+  color:#fff;
+  background-color:#26c;
+  border-radius:2px;
+  padding:3px;
+}
+
+.recording {
+  border-bottom:1px dashed #ddd;
+  padding:2px;
+}
