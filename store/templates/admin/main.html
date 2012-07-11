@@ -58,7 +58,7 @@
   <tr>
     <th>파일</th>
     <th>분류</th>
-    <th>강의</th>
+    <th style="width:460px;">강의</th>
     <th>관리</th>
   </tr>
 </thead>
@@ -68,7 +68,7 @@
   <td>{{recording.filename}}</td>
   <td>{{recording.category.description}}</td>
   <td>
-    {{ recording.title }} - {{ recording.speaker }}
+    <a href="#{{ recording.id }}" class="detail recordtitle">{{ recording.title }} - {{ recording.speaker }}</a>
     <div class="hide" id="desc{{recording.id}}">
       {{ recording.description }}
     </div>
@@ -88,6 +88,13 @@ $('.remove').click(function(e) {
   var ids = $(e.target).attr('href').split('#');
   $('#removeid').val(ids[1]);
   $('#removeform').submit();
+});
+
+$('.detail').click(function(e) {
+  e.preventDefault();
+  var target = e.target;
+  var ids = $(e.target).attr('href').split('#');
+  $('#desc'+ids[1]).toggle();
 });
 
 {% endblock %}

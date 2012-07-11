@@ -14,3 +14,8 @@
   border-bottom:1px dashed #ddd;
   padding:2px;
 }
+
+a.recordtitle {
+  text-decoration:underline;
+  color:#259;
+}
