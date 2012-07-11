@@ -31,17 +31,22 @@
   </div>
 </div>
 
-<div class="recordings">
+<div class="listing">
+<h3>세미나 리스트</h3>
+<table class="table table-condensed table-striped" style="width:70%;">
+<tbody>
 {% for recording in recordings %}
-<div class="recording row-fluid">
-  <div class="span8">
-    <a href="#">{{recording.title}}</a> - {{ recording.speaker }}
-  </div>
-  <div class="span4" style="text-align:right;">
-    <button class="btn btn-mini">purchase</button>
-  </div>
-</div>
+  <tr>
+    <td>
+      <a href="#" class="title">{{recording.title}}</a> 
+    </td>
+    <td>
+      {{ recording.speaker }}
+    </td>
+  </tr>
 {% endfor %}
+</tbody>
+</table>
 </div>
 
 {% endblock %}

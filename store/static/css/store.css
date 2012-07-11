@@ -17,7 +17,6 @@
   font-family:'helvetica neue';
   font-weight:200;
   margin-bottom:15px;
-  padding-left:10px;
 }
 
 .newmember {
@@ -112,4 +111,15 @@ span.credit {
   -moz-border-radius:5px;
   -webkit-border-radius:5px;
 
+}
+
+.listing h3 {
+  color:#a31;
+  margin-bottom:5px;
+}
+
+.title {
+  text-decoration:underline;
+  color:#269;
+  font-family:'nanumgothicotf';
 }
