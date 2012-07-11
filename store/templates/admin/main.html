@@ -67,7 +67,12 @@
 <tr>
   <td>{{recording.filename}}</td>
   <td>{{recording.category.description}}</td>
-  <td>{{ recording.title }} - {{ recording.speaker }}</td>
+  <td>
+    {{ recording.title }} - {{ recording.speaker }}
+    <div id="desc{{recording.id}}">
+      {{ recording.description }}
+    </div>
+  </td>
   <td><a href="#{{ recording.id }}" class="remove btn btn-mini">remove</a></td>
 </tr>
 {% endfor %}

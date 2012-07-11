@@ -52,15 +52,17 @@ class Recording(db.Model):
   speaker = db.Column(db.String(255), unique=False)
   conf = db.Column(db.Integer)
   ppt = db.Column(db.String(255))
+  description = db.Column(db.Text)
   categoryid = db.Column(db.Integer, db.ForeignKey('category.id'))
 
-  def __init__(self, bucket, filename, title, speaker, conf, ppt, recordtype):
+  def __init__(self, bucket, filename, title, speaker, conf, ppt, recordtype, description):
     self.bucket = bucket
     self.filename = filename
     self.title = title
     self.speaker = speaker
     self.conf = conf
     self.ppt = ppt
+    self.description = description
     self.categoryid = recordtype
 
 class Category(db.Model):
@@ -136,12 +138,13 @@ def add_recording():
   ppt = request.form['ppt']
   desc = request.form['desc']
   conf = int(request.form['conf'])
-
+  description = request.form['desc']
+  
   bucket = '2012-chicago'
   if conf == 1:
     bucket = '2012-indy'
 
-  recording = Recording(bucket, filename, title, speaker, conf, ppt, recordtype)
+  recording = Recording(bucket, filename, title, speaker, conf, ppt, recordtype, description)
   db.session.add(recording)
   db.session.commit()
 
