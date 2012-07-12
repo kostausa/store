@@ -1,3 +1,8 @@
+.construction, .recording a, .sub, .listing h3, a.title, .focus h1, .focus h3
+{
+  font-family:'nanumgothicotf','nanumgothic','helvetica neue','helvetica','arial';
+}
+
 .construction {
   font-size:1.2em;
   margin-top:100px;
@@ -6,7 +11,6 @@
   -moz-border-radius:10px;
   -webkit-border-radius:10px;  
   background-color:#eee;
-  font-family:'nanumgothicotf','nanumgothic','helvetica neue';
 }
 
 .content {
@@ -29,7 +33,6 @@
 }
 
 .recording a {
-  font-family:'nanumgothicotf','nanumgothic','helvetica neue';
   font-size:1.2em;
   text-decoration:underline;
   color:#444;
@@ -44,7 +47,6 @@
   color:#26c;
   font-size:1.4em;
   font-weight:200;
-  font-family:'nanumgothicotf','nanumgothic','helvetica neue';
   padding-bottom:4px;
   margin-bottom:10px;
   margin-top:10px;
@@ -94,6 +96,11 @@ span.credit {
   color:#6a3;
 }
 
+a.bl {
+  text-decoration:underline;
+  color:#257;
+}
+
 .log {
   font-size:12px;
   font-family:'helvetica neue','helvetica';
@@ -114,12 +121,34 @@ span.credit {
 }
 
 .listing h3 {
-  color:#a31;
+  color:#222;
   margin-bottom:5px;
 }
 
 .title {
   text-decoration:underline;
-  color:#269;
-  font-family:'nanumgothicotf';
+  color:#257;
+}
+
+a.buy {
+  text-decoration:underline;
+  color:#888;
+}
+
+.focus {
+  margin-top:30px;
+  padding-left:50px;
+}
+
+.focus h1 {
+  font-size:24px;
+}
+
+.focus .descbox {
+  margin-top:10px;
+  background-color:#eee;
+  border-radius:5px;
+  -moz-border-radius:5px;
+  -webkit-border-radius:5px;
+  padding:15px;
 }

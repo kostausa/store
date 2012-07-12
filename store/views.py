@@ -293,8 +293,42 @@ def main(conf):
   logs = get_logs(user)
   credit = get_credit(logs)
 
-  recordings = Recording.query.filter_by(conf=conference['code']).all()
+  recordings = {}
+  recordings['message'] = Recording.query \
+    .filter_by(conf=conference['code']).filter_by(categoryid=1).all()
+  recordings['seminar'] = Recording.query \
+    .filter_by(conf=conference['code']).filter_by(categoryid=2).all()
+  recordings['jj'] = Recording.query \
+    .filter_by(conf=conference['code']).filter_by(categoryid=4).all()
+
+  # chicago has more sections
+  if conference['code'] == 0:
+    recordings['testimony'] = Recording.query \
+      .filter_by(conf=conference['code']).filter_by(categoryid=3).all()
+    recordings['theme'] = Recording.query \
+      .filter_by(conf=conference['code']).filter_by(categoryid=5).all()
+
   return render_template('start.html', conf=conference, credit=credit, user=user, recordings=recordings)
+
+@app.route("/store/<conf>/focus/<id>")
+def focus(conf, id):
+  conference = makeconf(conf)
+  if not auth():
+    return render_template('login.html', conf=conference)
+
+  user = session['user']
+  logs = get_logs(user)
+  credit = get_credit(logs)
+
+  targetid = int(id)
+  recording = Recording.query.filter_by(id=targetid).first()
+
+  paragraphs = False
+  if not recording is None:
+    paragraphs = recording.description.split("\n")
+
+  return render_template('focus.html', conf=conference, credit=credit, 
+    user=user, recording=recording, paragraphs=paragraphs)
 
 def get_credit(logs):
   credit = {}

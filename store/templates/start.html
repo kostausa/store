@@ -32,24 +32,70 @@
 </div>
 
 <div class="listing">
-<h3>세미나 리스트</h3>
+<h3>전체집회</h3>
+* 폐회예배는 곧 업로드 하도록 하겠습니다. 
+
 <table class="table table-condensed table-striped">
 <tbody>
-{% for recording in recordings %}
+{% for recording in recordings.message %}
   <tr>
     <td>
-      <a href="#" class="title">{{recording.title}}</a> 
+      <a href="/store/{{conf.path}}/focus/{{recording.id}}" class="title">{{recording.title}}</a> 
     </td>
     <td style="width:110px;">
       {{ recording.speaker }}
     </td>
     <td style="width:200px;text-align:right;">
-      &nbsp;-
+      <a href="#" class="buy">구입</a>
     </td>
   </tr>
 {% endfor %}
 </tbody>
 </table>
 </div>
+
+<div class="listing">
+<h3>조장 수양회 - jjKOSTA</h3>
+<table class="table table-condensed table-striped">
+<tbody>
+{% for recording in recordings.jj %}
+  <tr>
+    <td>
+      <a href="/store/{{conf.path}}/focus/{{recording.id}}" class="title">{{recording.title}}</a> 
+    </td>
+    <td style="width:110px;">
+      {{ recording.speaker }}
+    </td>
+    <td style="width:200px;text-align:right;">
+      <a href="#" class="buy">구입</a>
+    </td>
+  </tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+
+<div class="listing">
+<h3>선택식 세미나</h3>
+<table class="table table-condensed table-striped">
+<tbody>
+{% for recording in recordings.seminar %}
+  <tr>
+    <td>
+      <a href="/store/{{conf.path}}/focus/{{recording.id}}" class="title">{{recording.title}}</a> 
+    </td>
+    <td style="width:110px;">
+      {{ recording.speaker }}
+    </td>
+    <td style="width:200px;text-align:right;">
+      <a href="#" class="buy">purchase</a>
+    </td>
+  </tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+
+
 
 {% endblock %}
