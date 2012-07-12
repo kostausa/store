@@ -115,6 +115,30 @@ def admin():
 
   return render_template("admin/main.html", conf=conf, recordings=recordings)
 
+@app.route("/store/admin/update/<id>", methods=['POST'])
+def update(id):
+  if not authadmin():
+    return redirect("/store/admin/login")
+
+  targetid = int(id)
+  recording = Recording.query.filter_by(id=targetid).first()
+
+  if recording is None:
+    return redirect("/store/admin")
+
+  ppt = request.form['ppt']
+  filename = request.form['filename']
+  description = request.form['description']
+
+  recording.ppt = ppt
+  recording.filename = filename
+  recording.description = description
+
+  db.session.add(recording)
+  db.session.commit()
+
+  return redirect("/store/admin")  
+
 @app.route("/store/admin/remove", methods=["POST"])
 def remove_recording():
   if not authadmin():
@@ -351,6 +375,7 @@ def buy(conf, id):
   
   return jsonify(result=True, total=total, unlimited=credit['unlimited'])
 
+    
 @app.route("/store/<conf>/focus/<id>")
 def focus(conf, id):
   conference = makeconf(conf)
