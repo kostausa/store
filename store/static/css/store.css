@@ -13,6 +13,29 @@
   background-color:#eee;
 }
 
+.modal .thumb {
+  float:left;
+  margin:5px 20px 10px 5px;
+  border:1px solid #eee;
+}
+
+.modal h3 {
+  color:#259;
+}
+
+.preview {
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
+  filter: alpha(opacity=20);
+  -moz-opacity: 0.2;
+  -khtml-opacity: 0.2;
+  opacity: 0.2;  
+  padding-right:10px;
+}
+
+.preview i {
+  margin-top:2px;
+}
+
 .content {
   margin-top:10px;
 }
@@ -128,11 +151,6 @@ a.bl {
 .title {
   text-decoration:underline;
   color:#257;
-}
-
-a.buy {
-  text-decoration:underline;
-  color:#888;
 }
 
 .focus {

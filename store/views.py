@@ -35,13 +35,15 @@ class History(db.Model):
   point = db.Column(db.Integer)
   userid = db.Column(db.Integer)
   detail = db.Column(db.Text)
+  recordingid = db.Column(db.Integer)
   created = db.Column(db.DateTime)
-  def __init__(self, type, purchase, point, userid, detail):
+  def __init__(self, type, purchase, point, userid, detail, recordingid):
     self.type = type
     self.purchase = purchase
     self.point = point
     self.userid = userid
     self.detail = detail
+    self.recordingid = recordingid
     self.created = datetime.datetime.now()
 
 class Recording(db.Model):
@@ -227,7 +229,7 @@ def swipe():
 
   user = session['user']
     
-  history = History('purchase', 1, usd, user.id, charge.id)
+  history = History('credit', 1, usd, user.id, charge.id)
   db.session.add(history)
   db.session.commit()
 
@@ -310,25 +312,76 @@ def main(conf):
 
   return render_template('start.html', conf=conference, credit=credit, user=user, recordings=recordings)
 
+@app.route("/store/<conf>/buy/<id>", methods=['POST'])
+def buy(conf, id):
+  conference = makeconf(conf)
+  if not auth():
+    return jsonify(result=False, reason='auth')
+
+  targetid = int(id)
+  user = session['user']
+
+  past = History.query \
+    .filter_by(userid=user.id) \
+    .filter_by(recordingid=targetid) \
+    .first()
+
+  if not past is None:
+    return jsonify(result=False, reason='exists')
+
+  recording = Recording.query.filter_by(id=targetid).first()
+
+  if recording is None:
+    return jsonify(result=False, reason='invalid')
+
+  logs = get_logs(user)
+  credit = get_credit(logs)
+
+  if not credit['unlimited'] and credit['total'] <= 0:
+    return jsonify(result=False, reason='credit')
+
+  history = History('purchase', 1, -1, user.id, recording.title, recording.id)
+  db.session.add(history)
+  db.session.commit()
+
+  if credit['unlimited']:
+    total = 0
+  else:
+    total = credit['total'] - 1;
+  
+  return jsonify(result=True, total=total, unlimited=credit['unlimited'])
+
 @app.route("/store/<conf>/focus/<id>")
 def focus(conf, id):
   conference = makeconf(conf)
   if not auth():
-    return render_template('login.html', conf=conference)
+    return jsonify(result=False)
 
   user = session['user']
-  logs = get_logs(user)
-  credit = get_credit(logs)
-
   targetid = int(id)
   recording = Recording.query.filter_by(id=targetid).first()
+
+  if recording is None:
+    return jsonify(result=False)
 
   paragraphs = False
   if not recording is None:
     paragraphs = recording.description.split("\n")
 
-  return render_template('focus.html', conf=conference, credit=credit, 
-    user=user, recording=recording, paragraphs=paragraphs)
+  thumburl = '/static/img/thumb.jpg'
+  if recording.ppt != '':
+    thumburl = '/static/img/thumbnail/' + conference['path'] + \
+      '/' + recording.filename.strip().replace('.mp3','.png')
+
+  return jsonify(
+    result=True,
+    id=recording.id,
+    thumbnail=thumburl,
+    title=recording.title,
+    speaker=recording.speaker,
+    ppt=recording.ppt,
+    description=paragraphs
+  )
 
 def get_credit(logs):
   credit = {}

@@ -49,9 +49,9 @@
         {{ log.created }} &mdash;
         <span class="gift">Gift Code</span>&nbsp;&nbsp;
         {{ log.detail }}  <span class="red">+{{ log.point }}</span> points
-      {% elif log.type == 'purchase' %}
+      {% elif log.type == 'credit' %}
         {{ log.created }} &mdash;
-        <span class="gift">Purchase</span>&nbsp;&nbsp;
+        <span class="gift">Credit</span>&nbsp;&nbsp;
         ${{ log.point }} 크레딧 카드 결제 <span class="red">+{{ log.point }}</span> points    
       {% endif %}
       </div>

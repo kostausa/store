@@ -34,19 +34,25 @@
 <div class="listing">
 <h3>전체집회</h3>
 * 폐회예배는 곧 업로드 하도록 하겠습니다. 
-
 <table class="table table-condensed table-striped">
 <tbody>
 {% for recording in recordings.message %}
   <tr>
     <td>
-      <a href="/store/{{conf.path}}/focus/{{recording.id}}" class="title">{{recording.title}}</a> 
+      <a href="#" data-target="{{recording.id}}" class="buy title">{{recording.title}}</a> 
+
     </td>
-    <td style="width:110px;">
+    <td style="width:150px;">
       {{ recording.speaker }}
     </td>
-    <td style="width:200px;text-align:right;">
-      <a href="#" class="buy">구입</a>
+    <td style="width:100px;text-align:right;">
+      <span class="preview">
+        {% if recording.ppt != '' %}
+        <i class="icon-picture"></i>
+        {% endif %}
+        <i class="icon-headphones"></i>
+      </span>
+      <button data-target="{{recording.id}}" class="buy btn btn-mini"><i class="icon-search"></i></button>
     </td>
   </tr>
 {% endfor %}
@@ -55,19 +61,26 @@
 </div>
 
 <div class="listing">
-<h3>조장 수양회 - jjKOSTA</h3>
+<h3>조장수양회 - jjKOSTA</h3>
 <table class="table table-condensed table-striped">
 <tbody>
 {% for recording in recordings.jj %}
   <tr>
     <td>
-      <a href="/store/{{conf.path}}/focus/{{recording.id}}" class="title">{{recording.title}}</a> 
+      <a href="#" data-target="{{recording.id}}" class="buy title">{{recording.title}}</a> 
+
     </td>
-    <td style="width:110px;">
+    <td style="width:150px;">
       {{ recording.speaker }}
     </td>
-    <td style="width:200px;text-align:right;">
-      <a href="#" class="buy">구입</a>
+    <td style="width:100px;text-align:right;">
+      <span class="preview">
+        {% if recording.ppt != '' %}
+        <i class="icon-picture"></i>
+        {% endif %}
+        <i class="icon-headphones"></i>
+      </span>
+      <button data-target="{{recording.id}}" class="buy btn btn-mini"><i class="icon-search"></i></button>
     </td>
   </tr>
 {% endfor %}
@@ -82,13 +95,20 @@
 {% for recording in recordings.seminar %}
   <tr>
     <td>
-      <a href="/store/{{conf.path}}/focus/{{recording.id}}" class="title">{{recording.title}}</a> 
+      <a href="#" data-target="{{recording.id}}" class="buy title">{{recording.title}}</a> 
+
     </td>
-    <td style="width:110px;">
+    <td style="width:150px;">
       {{ recording.speaker }}
     </td>
-    <td style="width:200px;text-align:right;">
-      <a href="#" class="buy">purchase</a>
+    <td style="width:100px;text-align:right;">
+      <span class="preview">
+        {% if recording.ppt != '' %}
+        <i class="icon-picture"></i>
+        {% endif %}
+        <i class="icon-headphones"></i>
+      </span>
+      <button data-target="{{recording.id}}" class="buy btn btn-mini"><i class="icon-search"></i></button>
     </td>
   </tr>
 {% endfor %}
@@ -96,6 +116,126 @@
 </table>
 </div>
 
+<div class="modal hide" id="purchase"></div>
 
+{% endblock %}
 
+{% block js %}
+<script type="text/javascript">
+var Store = {};
+Store.purchase = (function() {
+  var recording = {
+    "detail": function(id) {
+      $.ajax({
+        "url" : '/store/{{conf.path}}/focus/'+id,
+        "dataType": 'json',
+        "success": modalbox.view,
+        "error": function(data) {
+          alert('fail');
+        }
+      });
+    },
+    "update": function(data) {
+      console.log(data);
+    }
+  };
+
+  var modalbox = {
+    "view" : function(data) {
+      if (!(data && data.result)) {
+        return false;
+      }
+
+      data.paragraphs = [];
+      for (var i in data.description) {
+        var paragraph = data.description[i];
+        if (paragraph == '') {
+          continue;
+        }
+        data.paragraphs.push(paragraph);
+      }
+
+      if (data.ppt == '') {
+        data.ppt = false;
+      }
+
+      var _m = Hogan.compile($('#_template-modal').html());            
+      $('.modal').html(
+        _m.render(data)
+      );  
+
+      $('#purchase').modal();
+      return false;          
+    },
+    "submit": function(id) {
+      $.ajax({
+        "type": 'POST',
+        "url" : '/store/{{conf.path}}/buy/'+id,
+        "dataType": 'json',
+        "success": recording.update,
+        "error": function(data) {
+          return false;
+        }
+      });
+    }
+  };
+
+  return {
+    "setup": function() {
+
+      $('#purchase').on('click', '.purchase', function(e) {
+        e.preventDefault();
+        var id = $(e.currentTarget).data('target');
+        modalbox.submit(id);
+      });
+
+      $('.buy').click(function(e) {
+        e.preventDefault();
+        var id = $(e.currentTarget).data('target');
+        recording.detail(id);        
+      });
+
+    }
+  };
+})();
+</script>
+<script type="text/html" id="_template-modal">
+{% raw %}
+
+<div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal">×</button>
+  <h3>{{title}}</h3>
+  <div style="font-size:1.2em">&mdash; {{speaker}}</div>
+</div>
+<div class="modal-body">
+
+  <img src="{{thumbnail}}" class="thumb">
+  {{#paragraphs}}
+    <p>{{.}}</p>
+  {{/paragraphs}}
+
+  <div style="text-align:right;">
+
+    <span class="label label-info"><i class="icon-headphones icon-white"></i> MP3</span>
+    {{#ppt}}
+      <span class="label label-info"><i class="icon-picture icon-white"></i> 슬라이드 PDF</span>
+    {{/ppt}}
+    
+    <div style="margin-top:15px;">
+      가격: 1 포인트
+    </div>
+
+  </div>
+</div>
+<div class="modal-footer">
+  <a href="#" class="btn" data-dismiss="modal">창닫기</a>
+  <button class="btn btn-success purchase" data-target="{{ id }}" data-loading-text="처리중 ...">구입하기</button>
+</div>
+
+{% endraw %}
+</script>
+{% endblock %}
+
+{% block setupjs %}
+Store.purchase.setup();
 {% endblock %}
