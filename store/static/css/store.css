@@ -1,4 +1,4 @@
-.construction, .recording a, .sub, .listing h3, a.title, .focus h1, .focus h3
+.construction, .recording a, .sub, .listing h3, a.title, .focus h1, .focus h3, .help
 {
   font-family:'nanumgothicotf','nanumgothic','helvetica neue','helvetica','arial';
 }
@@ -21,6 +21,11 @@
 
 .modal h3 {
   color:#259;
+}
+
+a.charge {
+  text-decoration:underline;
+  color:#333;
 }
 
 .status {
@@ -46,7 +51,7 @@
 }
 .conf {
   font-size:1.5em;
-  font-family:'helvetica neue';
+  font-family:'helvetica neue', 'helvetica';
   font-weight:200;
   margin-bottom:15px;
 }
@@ -176,3 +181,13 @@ a.bl {
   -webkit-border-radius:5px;
   padding:15px;
 }
+
+.help {
+  margin-top:50px;
+}
+
+ul.social {
+  text-align:right;
+  list-style:none;
+}
+
