@@ -166,7 +166,7 @@
       {% if credit.unlimited or recording.id in owned %}
         <div class="options">
           {% if recording.note != '': %}          
-          <button class="btn btn-mini btn-info note" data-loading-text="Note" data-material="note" data-id="{{recording.id}}">Note</button>
+          <button class="btn btn-mini note" data-loading-text="Note" data-material="note" data-id="{{recording.id}}">Note</button>
           {% endif %}
           {% if recording.ppt != '': %}          
           <button class="btn btn-mini btn-info slide" data-loading-text="Slide" data-material="slide" data-id="{{recording.id}}">Slide</button>
