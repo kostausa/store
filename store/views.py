@@ -410,6 +410,9 @@ def focus(conf, id):
     return jsonify(result=False)
 
   user = session['user']
+  logs = get_logs(user)
+  credit = get_credit(logs)
+
   targetid = int(id)
   recording = Recording.query.filter_by(id=targetid).first()
 
@@ -426,7 +429,7 @@ def focus(conf, id):
     .first()
 
   owned = False
-  if not log is None:
+  if credit['unlimited'] or not log is None:
     owned = True
 
   thumburl = '/static/img/thumb.jpg'
