@@ -54,16 +54,18 @@ class Recording(db.Model):
   speaker = db.Column(db.String(255), unique=False)
   conf = db.Column(db.Integer)
   ppt = db.Column(db.String(255))
+  note = db.Column(db.String(255))
   description = db.Column(db.Text)
   categoryid = db.Column(db.Integer, db.ForeignKey('category.id'))
 
-  def __init__(self, bucket, filename, title, speaker, conf, ppt, recordtype, description):
+  def __init__(self, bucket, filename, title, speaker, conf, ppt, recordtype, description, note):
     self.bucket = bucket
     self.filename = filename
     self.title = title
     self.speaker = speaker
     self.conf = conf
     self.ppt = ppt
+    self.note = note
     self.description = description
     self.categoryid = recordtype
 
@@ -131,10 +133,12 @@ def update(id):
     return redirect("/store/admin")
 
   ppt = request.form['ppt']
+  note = request.form['note']
   filename = request.form['filename']
   description = request.form['description']
 
   recording.ppt = ppt
+  recording.note = note
   recording.filename = filename
   recording.description = description
 
@@ -166,6 +170,7 @@ def add_recording():
   speaker = request.form['speaker']
   filename = request.form['file']
   ppt = request.form['ppt']
+  note = request.form['note']
   desc = request.form['desc']
   conf = int(request.form['conf'])
   description = request.form['desc']
@@ -174,7 +179,7 @@ def add_recording():
   if conf == 1:
     bucket = '2012-indy'
 
-  recording = Recording(bucket, filename, title, speaker, conf, ppt, recordtype, description)
+  recording = Recording(bucket, filename, title, speaker, conf, ppt, recordtype, description, note)
   db.session.add(recording)
   db.session.commit()
 

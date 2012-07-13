@@ -42,10 +42,11 @@
   <div style="margin-left:20px;">
 
     <div class="row">
-      <input type="text" class="span5" name="title" placeholder="제목">
+      <input type="text" class="span9" name="title" placeholder="제목">
       <input type="text" class="span5" name="speaker" placeholder="강사">
       <input type="text" class="span5" name="file" placeholder="녹음파일">
       <input type="text" class="span5" name="ppt" placeholder="PPT파일">
+      <input type="text" class="span5" name="note" placeholder="강의안파일">
       <textarea name="desc" class="span10" style="height:100px;" placeholder="설명"></textarea>
     </div>
 
@@ -74,6 +75,7 @@
     <form action="/store/admin/update/{{recording.id}}" method="POST">
       <input type="text" name="filename" style="width:95%;" placeholder="녹음파일" value="{{ recording.filename }}">
       <input type="text" name="ppt" style="width:95%;" placeholder="PPT 파일" value="{{ recording.ppt }}">
+      <input type="text" name="note" style="width:95%;" placeholder="Note 파일" value="{{ recording.note }}">      
       <textarea name="description" style="width:95%;height:100px;" placeholder="Description">{{ recording.description }}</textarea>
       <button type="submit" class="btn btn-mini btn-warning pull-right" style="margin:2px 15px 10px auto;">update</button>
 

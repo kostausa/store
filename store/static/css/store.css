@@ -187,7 +187,13 @@ a.bl {
 }
 
 ul.social {
+  margin-top:40px;
   text-align:right;
   list-style:none;
+}
+
+ul.social a {
+  text-decoration:underline;
+  color:#26c;
 }
 
