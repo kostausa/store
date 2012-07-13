@@ -16,42 +16,80 @@
   {{ conf.name }} Conference
 </div>
 
-<div style="margin-top:20px;padding-left:20px;">
+<div style="margin-top:30px;padding-left:20px;">
 
 <div class="sub">
 카드결제 : <span class="red">${{amount}}</span>
 </div>
 
-<form action="/store/swipe" method="POST" id="payment-form">
-<input type="hidden" name="conf" value="{{conf.path}}">
-<input type="hidden" name="amount" value="{{amount}}00">
-<input type="hidden" id="stripeToken" name="stripeToken" value="">
- <div class="form-row">
-  <label>Name ( 카드에 나온 )</label>
-  <input type="text" autocomplete="off" class="span3 card-name"/>
- </div>
- <div class="form-row">
-  <label>Card Number</label>
-  <input type="text" autocomplete="off" class="span3 card-number"/>
- </div>
- <div class="form-row">
-   <label>CVC</label>
-   <input type="text" size="4" autocomplete="off" class="card-cvc"/>
-</div>
-<div class="form-row">
-  <label>Expiration (MM/YYYY)</label>
-  <input type="text" size="2" class="card-expiry-month input-small"/>
-  <span> / </span>
-  <input type="text" size="4" class="card-expiry-year input-small"/>
-</div>
-<div style="margin-top:20px;">
+<div class="row-fluid">
+  <div class="span4">
 
-<div class="row">
-  <div class="hide alert alert-danger errmsg span3"></div>
-</div>  
-  <button type="submit" id="pay" data-loading-text="결제중" class="btn btn-primary btn-large">카드결제하기</button>
+    <form action="/store/swipe" method="POST" id="payment-form">
+      <input type="hidden" name="conf" value="{{conf.path}}">
+      <input type="hidden" name="amount" value="{{amount}}00">
+      <input type="hidden" id="stripeToken" name="stripeToken" value="">
+       <div class="form-row">
+        <label>Name ( 카드에 나온 )</label>
+        <input type="text" autocomplete="off" class="span12 card-name"/>
+       </div>
+       <div class="form-row">
+        <label>Card Number</label>
+        <input type="text" autocomplete="off" class="span12 card-number"/>
+       </div>
+       <div class="form-row">
+         <label>CVC</label>
+         <input type="text" size="4" autocomplete="off" class="span12 card-cvc"/>
+      </div>
+      <div class="form-row">
+        <label>Expiration ( MM/YYYY )</label>
+        <input type="text" size="2" class="card-expiry-month input-small"/>
+        <span> / </span>
+        <input type="text" size="4" class="card-expiry-year input-small"/>
+      </div>
+      <div style="margin-top:20px;">
+
+        <div class="hide alert alert-danger errmsg"></div>
+
+        <button type="submit" id="pay" data-loading-text="결제중" class="btn btn-primary btn-large">카드결제하기</button>
+      </div>
+    </form>
+
+  </div>
+  
+  <div class="span6">
+    <div class="well pull-right" style="color:#777;margin-top:10px">
+
+      <p>
+      <div>
+        <i class="icon-lock"></i>
+        모든 결제는 암호화(SSL)되어 전송되며,
+      </div> 
+        코스타 서버에는 카드 정보가 저장되지 않습니다.
+      </p>      
+
+      <p>
+        사용 가능한 신용카드
+        <ul>
+          <li>VISA</li>
+          <li>Master</li>
+          <li>Discover</li>
+          <li>American Express</li>
+        </ul>
+      </p>
+
+      <p>
+        CVC 는 카드뒤에 있는 <a href="#" class="cvc charge">3자리 숫자</a>입니다
+        <div>
+          <img src="/static/img/cvc.jpg" class="hide pull-right" id="cvcdesc" style="width:100px;">
+        </div>
+      </p>
+
+    </div>
+  </div>
+
 </div>
-</form>
+
 
 </div>
 
@@ -145,6 +183,10 @@
     return {
       "setup" : function() {
         Stripe.setPublishableKey('pk_QW1ledt2oHZGEL9i0b1HJzLeeQ5B1');
+
+        $('.cvc').click(function() {
+          $('#cvcdesc').fadeToggle('fast');
+        });
 
         $('#payment-form').submit(function(e) {
           if (token.id === undefined) {
