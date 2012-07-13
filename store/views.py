@@ -533,7 +533,7 @@ def redeem(conf):
     db.session.add(code)
     db.session.commit()
 
-    history = History('gift', 1, code.credit, user.id, code.code)
+    history = History('gift', 1, code.credit, user.id, code.code, 0)
     db.session.add(history)
     db.session.commit()
 
