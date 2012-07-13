@@ -319,6 +319,9 @@ def url(conf,material,id):
   if material == 'slide' and recording.ppt != '':
     resource = recording.ppt
 
+  elif material == 'note' and recording.note != '':
+    resource = recording.note
+
   url = s3.url(recording.bucket, resource, 60*5)
   return jsonify(
     result=True,
@@ -390,6 +393,10 @@ def buy(conf, id):
   if recording.ppt != '':
     ppt = True
 
+  note = False
+  if recording.note != '':
+    note = True
+
   logs = get_logs(user)
   credit = get_credit(logs)
 
@@ -405,7 +412,7 @@ def buy(conf, id):
   else:
     total = credit['total'] - 1;
   
-  return jsonify(result=True, id=targetid, ppt=ppt, total=total, unlimited=credit['unlimited'])
+  return jsonify(result=True, id=targetid, note=note, ppt=ppt, total=total, unlimited=credit['unlimited'])
 
     
 @app.route("/store/<conf>/focus/<id>")
@@ -444,12 +451,13 @@ def focus(conf, id):
 
   return jsonify(
     result=True,
-    owned=owned,
+    owned=owned,    
     id=recording.id,
     thumbnail=thumburl,
     title=recording.title,
     speaker=recording.speaker,
     ppt=recording.ppt,
+    note=recording.note,
     description=paragraphs
   )
 
