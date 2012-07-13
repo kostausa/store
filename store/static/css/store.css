@@ -23,12 +23,17 @@
   color:#259;
 }
 
+.status {
+  color:#a00;
+  margin-bottom:3px;
+}
+
 .preview {
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
-  filter: alpha(opacity=20);
-  -moz-opacity: 0.2;
-  -khtml-opacity: 0.2;
-  opacity: 0.2;  
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=30)";
+  filter: alpha(opacity=30);
+  -moz-opacity: 0.3;
+  -khtml-opacity: 0.3;
+  opacity: 0.3;  
   padding-right:10px;
 }
 
@@ -51,6 +56,7 @@
 }
 
 .newmember a {
+  font-size:1.0em;
   text-decoration:underline;
   color:#555;
 }

@@ -5,11 +5,13 @@
 {% block menu %}
 <div class="remains">
   <i class="icon-signal"></i> 
+  <span id="points">
   {% if credit.unlimited %}
   무제한
   {% else %}
   {{ credit.total }} 포인트
   {% endif %}
+  </span>
 </div>
       
 <ul class="nav nav-tabs nav-stacked">
@@ -45,7 +47,15 @@
     <td style="width:150px;">
       {{ recording.speaker }}
     </td>
-    <td style="width:100px;text-align:right;">
+    <td style="width:100px;text-align:right;" id="opt{{recording.id}}">
+      {% if credit.unlimited or recording.id in owned %}
+        <div class="options">
+          {% if recording.ppt != '': %}          
+          <button class="btn btn-mini btn-info slide"  data-loading-text="Slide" data-material="slide" data-id="{{recording.id}}">Slide</button>
+          {% endif %}
+          <button class="btn btn-mini btn-primary mp3" data-loading-text="MP3" data-material="mp3" data-id="{{recording.id}}">MP3</button>    
+        </div>
+      {% else %}
       <span class="preview">
         {% if recording.ppt != '' %}
         <i class="icon-picture"></i>
@@ -53,6 +63,7 @@
         <i class="icon-headphones"></i>
       </span>
       <button data-target="{{recording.id}}" class="buy btn btn-mini"><i class="icon-search"></i></button>
+      {% endif %}
     </td>
   </tr>
 {% endfor %}
@@ -73,7 +84,15 @@
     <td style="width:150px;">
       {{ recording.speaker }}
     </td>
-    <td style="width:100px;text-align:right;">
+    <td style="width:100px;text-align:right;" id="opt{{recording.id}}">
+      {% if credit.unlimited or recording.id in owned %}
+        <div class="options">
+          {% if recording.ppt != '': %}
+          <button class="btn btn-mini btn-info slide" data-loading-text="Slide" data-material="slide" data-id="{{recording.id}}">Slide</button>
+          {% endif %}
+          <button class="btn btn-mini btn-primary mp3" data-loading-text="MP3" data-material="mp3" data-id="{{recording.id}}">MP3</button>    
+        </div>
+      {% else %}      
       <span class="preview">
         {% if recording.ppt != '' %}
         <i class="icon-picture"></i>
@@ -81,6 +100,7 @@
         <i class="icon-headphones"></i>
       </span>
       <button data-target="{{recording.id}}" class="buy btn btn-mini"><i class="icon-search"></i></button>
+      {% endif %}
     </td>
   </tr>
 {% endfor %}
@@ -101,7 +121,15 @@
     <td style="width:150px;">
       {{ recording.speaker }}
     </td>
-    <td style="width:100px;text-align:right;">
+    <td style="width:100px;text-align:right;" id="opt{{recording.id}}">
+      {% if credit.unlimited or recording.id in owned %}
+        <div class="options">
+          {% if recording.ppt != '': %}          
+          <button class="btn btn-mini btn-info slide" data-loading-text="Slide" data-material="slide" data-id="{{recording.id}}">Slide</button>
+          {% endif %}
+          <button class="btn btn-mini btn-primary mp3" data-loading-text="MP3" data-material="mp3" data-id="{{recording.id}}">MP3</button>    
+        </div>
+      {% else %}      
       <span class="preview">
         {% if recording.ppt != '' %}
         <i class="icon-picture"></i>
@@ -109,6 +137,7 @@
         <i class="icon-headphones"></i>
       </span>
       <button data-target="{{recording.id}}" class="buy btn btn-mini"><i class="icon-search"></i></button>
+      {% endif %}
     </td>
   </tr>
 {% endfor %}
@@ -136,7 +165,46 @@ Store.purchase = (function() {
       });
     },
     "update": function(data) {
-      console.log(data);
+      if (!(data && data.result)) {
+        var msg = "오류가 있었습니다";
+        switch (data.reason) {
+          case 'exists':
+            msg = "이미 구입하신 강의입니다";
+            break;
+
+          case 'credit':
+            msg = "쓰실 수 있는 크레딧이 없습니다.";
+            break;
+
+          case 'auth':
+          case 'invalid':
+          default:
+            msg = "오류가 있었습니다. 다시 한번 시도해 주세요";
+            break;
+        }
+        $('.status')
+          .html(msg)
+          .slideDown('fast');
+
+        setTimeout(function() {
+          $('.status').slideUp('fast');
+        }, 3000);
+        return false;
+      }
+
+      var _o = Hogan.compile($('#_template-option').html());
+      $('#opt'+data.id).html(_o.render({
+        "id"  : data.id,
+        "ppt" : data.ppt
+      }));
+
+      if (!data.unlimited) {
+        $('#points').html(
+          data.total + ' 포인트'
+        );
+      }
+
+      $('.modal').modal('hide');
     }
   };
 
@@ -180,6 +248,34 @@ Store.purchase = (function() {
     }
   };
 
+  var s3 = {
+    "delayreset": function(target) {
+      setTimeout(function() {
+        $(target).button('reset');
+      }, 1000);
+    },
+    "download" : function(id, material, e) {
+      $(e.currentTarget).button('loading');
+      var _self = this;
+
+      $.ajax({
+        "url" : '/store/{{conf.path}}/download/'+material+'/'+id,
+        "dataType": 'json',
+        "success": function(data) {
+          _self.delayreset(e.currentTarget);
+          if (!(data && data.result)) {
+            return false;
+          }
+
+          document.location = data.url;
+        },
+        "error": function(data) {
+          _self.delayreset(e.currentTarget);
+        }
+      });
+    }
+  };
+
   return {
     "setup": function() {
 
@@ -192,7 +288,14 @@ Store.purchase = (function() {
       $('.buy').click(function(e) {
         e.preventDefault();
         var id = $(e.currentTarget).data('target');
-        recording.detail(id);        
+        recording.detail(id);       
+      });
+
+      $('.listing').on('click', '.slide, .mp3', function(e) {
+        e.preventDefault();
+        var id = $(e.currentTarget).data('id');
+        var material = $(e.currentTarget).data('material');
+        s3.download(id, material, e);
       });
 
     }
@@ -228,12 +331,29 @@ Store.purchase = (function() {
   </div>
 </div>
 <div class="modal-footer">
+  <div class="status hide"></div>
   <a href="#" class="btn" data-dismiss="modal">창닫기</a>
+  {{^owned}}
   <button class="btn btn-success purchase" data-target="{{ id }}" data-loading-text="처리중 ...">구입하기</button>
+  {{/owned}}
 </div>
 
 {% endraw %}
 </script>
+
+<script type="text/html" id="_template-option">
+{% raw %}
+  
+  <div class="options">
+    {{#ppt}}
+    <button class="btn btn-mini btn-info slide" data-loading-text="Slide" data-material="slide" data-id="{{id}}">Slide</button>
+    {{/ppt}}
+    <button class="btn btn-mini btn-primary mp3" data-loading-text="MP3" data-material="mp3" data-id="{{id}}">MP3</button>    
+  </div>
+
+{% endraw %}
+</script>
+
 {% endblock %}
 
 {% block setupjs %}

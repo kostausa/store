@@ -44,23 +44,26 @@
   <div class="history">
     사용내역
     {% for log in logs %}
-      <div class="log">
       {% if log.type == 'gift' %}
-        {{ log.created }} &mdash;
-        <span class="gift">Gift Code</span>&nbsp;&nbsp;
-        {{ log.detail }}  <span class="red">+{{ log.point }}</span> points
+        <div class="log">
+          {{ log.created }} &mdash;
+          <span class="gift">Gift Code</span>&nbsp;&nbsp;
+          {{ log.detail }}  <span class="red">+{{ log.point }}</span> points
+        </div>
       {% elif log.type == 'credit' %}
-        {{ log.created }} &mdash;
-        <span class="gift">Credit</span>&nbsp;&nbsp;
-        ${{ log.point }} 크레딧 카드 결제 <span class="red">+{{ log.point }}</span> points    
-      {% elif log.type == 'purchase' %}
-        {{ log.created }} &mdash;
-        <span class="gift">Purchase</span>&nbsp;&nbsp;
-        구입 <span class="red">{{ log.point }}</span> point
-        &lt;{{ log.detail }}&gt;
+        <div class="log">
+          {{ log.created }} &mdash;
+          <span class="gift">Credit</span>&nbsp;&nbsp;
+          ${{ log.point }} 크레딧 카드 결제 <span class="red">+{{ log.point }}</span> points    
+        </div>
+      {% elif log.type == 'purchase' and not credit.unlimited %}
+        <div class="log">
+          {{ log.created }} &mdash;
+          <span class="gift">Purchase</span>&nbsp;&nbsp;
+          구입 <span class="red">{{ log.point }}</span> point
+          &lt;{{ log.detail }}&gt;
+        </div>
       {% endif %}
-      </div>
-
     {% endfor %}
   </div>
 

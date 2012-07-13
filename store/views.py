@@ -87,8 +87,12 @@ def makeconf(conf):
 
   return conference
 
-def auth():
+def auth(conf):
   if 'user' in session and not session['user'] is None:
+    user = session['user']
+    if user.conf != conf['code']:
+      return False
+
     return True
   else: 
     return False
@@ -209,7 +213,7 @@ def newmember(conf):
     name = request.form['name']
     password = request.form['pass']
 
-    user = User.query.filter_by(email=email).filter_by(conf=conf).first()
+    user = User.query.filter_by(email=email).filter_by(conf=conference['code']).first()
     if not user is None:
       return render_template('newmember.html', 
         conf=conference, error=True, reason='exists', email=email)
@@ -232,7 +236,7 @@ def swipe():
   amount = int(request.form['amount'])
   conference = makeconf(request.form['conf'])
 
-  if not auth():
+  if not auth(conference):
     return render_template('login.html', conf=conference)
 
   stripe.api_key = app.config['STRIPE_API_KEY']
@@ -253,7 +257,7 @@ def swipe():
 
   user = session['user']
     
-  history = History('credit', 1, usd, user.id, charge.id)
+  history = History('credit', 1, usd, user.id, charge.id, 0)
   db.session.add(history)
   db.session.commit()
 
@@ -281,27 +285,36 @@ def login(conf):
   session['user'] = user
   return redirect(url_for('main', conf=conf))
 
-@app.route("/store/<conf>/purchase/recording/<id>")
-def url(conf,id):
+@app.route("/store/<conf>/download/<material>/<id>")
+def url(conf,material,id):
   conference = makeconf(conf)
-  if not auth():
+  if not auth(conference):
     return render_template('login.html', conf=conference)
-
-  recording = Recording.query \
-    .filter_by(id=id) \
-    .first()
-
-  if recording is None:
-    return jsonify(result=False)
 
   user = session['user']
   logs = get_logs(user)
   credit = get_credit(logs)
 
-  if not credit['unlimited'] and credit['total'] <= 0:
+  targetid = int(id)
+
+  if not credit['unlimited']:
+    instance = History.query \
+      .filter_by(userid=user.id) \
+      .filter_by(recordingid=targetid) \
+      .first()
+
+    if instance is None:
+      return jsonify(result=False)
+
+  recording = Recording.query.filter_by(id=targetid).first()
+  if recording is None:
     return jsonify(result=False)
-    
-  url = s3.url(recording.bucket, 'seminar-01.mp3', 60*5)
+
+  resource = recording.filename
+  if material == 'slide' and recording.ppt != '':
+    resource = recording.ppt
+
+  url = s3.url(recording.bucket, resource, 60*5)
   return jsonify(
     result=True,
     url=url
@@ -312,7 +325,7 @@ def url(conf,id):
 @app.route("/store/<conf>")
 def main(conf):
   conference = makeconf(conf)
-  if not auth():
+  if not auth(conference):
     return render_template('login.html', conf=conference)
 
   user = session['user']
@@ -334,12 +347,22 @@ def main(conf):
     recordings['theme'] = Recording.query \
       .filter_by(conf=conference['code']).filter_by(categoryid=5).all()
 
-  return render_template('start.html', conf=conference, credit=credit, user=user, recordings=recordings)
+  history = History.query \
+    .filter_by(userid=user.id) \
+    .filter_by(type='purchase') \
+    .all()
+
+  owned = {}
+  for h in history:
+    owned[h.recordingid] = True
+
+  return render_template('start.html', conf=conference, credit=credit, 
+    user=user, recordings=recordings, owned=owned)
 
 @app.route("/store/<conf>/buy/<id>", methods=['POST'])
 def buy(conf, id):
   conference = makeconf(conf)
-  if not auth():
+  if not auth(conference):
     return jsonify(result=False, reason='auth')
 
   targetid = int(id)
@@ -358,6 +381,10 @@ def buy(conf, id):
   if recording is None:
     return jsonify(result=False, reason='invalid')
 
+  ppt = False
+  if recording.ppt != '':
+    ppt = True
+
   logs = get_logs(user)
   credit = get_credit(logs)
 
@@ -373,13 +400,13 @@ def buy(conf, id):
   else:
     total = credit['total'] - 1;
   
-  return jsonify(result=True, total=total, unlimited=credit['unlimited'])
+  return jsonify(result=True, id=targetid, ppt=ppt, total=total, unlimited=credit['unlimited'])
 
     
 @app.route("/store/<conf>/focus/<id>")
 def focus(conf, id):
   conference = makeconf(conf)
-  if not auth():
+  if not auth(conference):
     return jsonify(result=False)
 
   user = session['user']
@@ -393,6 +420,15 @@ def focus(conf, id):
   if not recording is None:
     paragraphs = recording.description.split("\n")
 
+  log = History.query \
+    .filter_by(userid=user.id) \
+    .filter_by(recordingid=targetid) \
+    .first()
+
+  owned = False
+  if not log is None:
+    owned = True
+
   thumburl = '/static/img/thumb.jpg'
   if recording.ppt != '':
     thumburl = '/static/img/thumbnail/' + conference['path'] + \
@@ -400,6 +436,7 @@ def focus(conf, id):
 
   return jsonify(
     result=True,
+    owned=owned,
     id=recording.id,
     thumbnail=thumburl,
     title=recording.title,
@@ -452,7 +489,7 @@ def get_logs(user):
 
 def render_points(conf, error=False):
   conference = makeconf(conf)
-  if not auth():
+  if not auth(conference):
     return render_template('login.html', conf=conference)
 
   user = session['user']  
@@ -470,7 +507,7 @@ def points(conf):
 @app.route("/store/<conf>/redeem", methods=['POST'])
 def redeem(conf):
   conference = makeconf(conf)
-  if not auth():
+  if not auth(conference):
     return render_template('login.html', conf=conference)
 
   user = session['user']
@@ -505,7 +542,7 @@ def redeem(conf):
 @app.route("/store/<conf>/info")
 def info(conf):
   conference = makeconf(conf)
-  if not auth():
+  if not auth(conference):
     return render_template('login.html', conf=conference)
 
   user = session['user']

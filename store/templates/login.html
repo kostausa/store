@@ -8,14 +8,45 @@
   {{ conf.name }} Conference
 </div>
 
-<form class="well form-inline" action="/store/{{conf.path}}/login" method="POST">
-  <input type="text" class="input-medium" placeholder="Email" name="email">
-  <input type="password" class="input-small" placeholder="Password" name="pass">
-  <button type="submit" class="btn btn-info">로그인</button>
-  <div class="pull-right newmember">
-    <a href="/store/{{conf.path}}/newmember">아직 계정이 없습니다 &mdash; 가입하기</a>
-  </div>
-</form>
+  <div class="row-fluid well">
 
+    <div class="span6">
+
+      <div style="margin-bottom:20px;">
+        <div>온라인 스토어에 오신 것을 환영합니다</div>
+      </div>
+
+      <form class="form-horizontal" action="/store/{{conf.path}}/login" method="POST">
+
+        <div class="control-group">
+          <label class="control-label" for="email">이메일</label>
+          <div class="controls">
+            <input type="text" class="input-large" placeholder="Email" name="email" id="email">
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label" for="pass">패스워드</label>
+          <div class="controls">
+            <input type="password" class="input-large" placeholder="Password" name="pass" id="pass">
+          </div>
+        </div>
+
+        <div class="control-group">          
+          <button type="submit" class="btn btn-info btn-large pull-right">로그인</button>
+        </div>
+
+        <div class="newmember pull-right">
+          <a href="/store/{{conf.path}}/newmember">아직 계정이 없습니다 &mdash; 가입하기</a>
+        </div>
+
+      </form>
+
+    </div>
+    <div class="span6">
+      <img src="/static/img/poster.jpg" style="width:330px;" class="pull-right">
+    </div>
+
+  </div>
 
 {% endblock %}
