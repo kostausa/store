@@ -199,6 +199,11 @@
 {% block js %}
 <script type="text/javascript">
 var Store = {};
+
+Store.context = {
+  "ios" : {% if ios: %}true{% else %}false{% endif %}
+};
+
 Store.purchase = (function() {
   var recording = {
     "detail": function(id) {
@@ -278,6 +283,8 @@ Store.purchase = (function() {
       if (data.note == '') {
         data.note = false;
       }
+
+      data.ios = Store.context.ios;
 
       var _m = Hogan.compile($('#_template-modal').html());            
       $('.modal').html(
@@ -364,7 +371,8 @@ Store.purchase = (function() {
 </div>
 <div class="modal-body">
 
-  <img src="{{thumbnail}}" class="thumb">
+  <img src="{{thumbnail}}" class="thumb" style="width:120px;">
+
   {{#paragraphs}}
     <p>{{.}}</p>
   {{/paragraphs}}

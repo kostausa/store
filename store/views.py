@@ -74,6 +74,12 @@ class Category(db.Model):
   description = db.Column(db.String(255), unique=True)
   recording = db.relationship('Recording', backref='category')
 
+def isios(req):
+  # if from ios, do not trigger download but stream the files instead. 
+  if ('iPad' in req.user_agent.string) or ('iPhone' in req.user_agent.string):
+    return True
+  return False
+
 def makeconf(conf):
   conference = {}
   if conf == 'chicago':
@@ -322,8 +328,7 @@ def url(conf,material,id):
   elif material == 'note' and recording.note != '':
     resource = recording.note
 
-  # if from ios, do not trigger download but stream the files instead. 
-  if ('iPad' in request.user_agent.string) or ('iPhone' in request.user_agent.string):
+  if isios(request):
     resource = 'mobile/' + resource
 
   url = s3.url(recording.bucket, resource, 60*5)
@@ -368,8 +373,10 @@ def main(conf):
   for h in history:
     owned[h.recordingid] = True
 
+  ios = isios(request)
+
   return render_template('start.html', conf=conference, credit=credit, 
-    user=user, recordings=recordings, owned=owned)
+    user=user, recordings=recordings, owned=owned, ios=ios)
 
 @app.route("/store/<conf>/buy/<id>", methods=['POST'])
 def buy(conf, id):
@@ -448,7 +455,12 @@ def focus(conf, id):
   if credit['unlimited'] or not log is None:
     owned = True
 
+  ios = isios(request)
+
   thumburl = '/static/img/thumb.jpg'
+  if ios:
+    thumburl = '/static/img/thumb@2x.jpg'
+
   if recording.ppt != '':
     thumburl = '/static/img/thumbnail/' + conference['path'] + \
       '/' + recording.filename.strip().replace('.mp3','.png')
