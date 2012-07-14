@@ -322,6 +322,7 @@ def url(conf,material,id):
   elif material == 'note' and recording.note != '':
     resource = recording.note
 
+  # if from ios, do not trigger download but stream the files instead. 
   if ('iPad' in request.user_agent.string) or ('iPhone' in request.user_agent.string):
     resource = 'mobile/' + resource
 
