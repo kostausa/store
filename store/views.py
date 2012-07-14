@@ -322,6 +322,9 @@ def url(conf,material,id):
   elif material == 'note' and recording.note != '':
     resource = recording.note
 
+  if ('iPad' in request.user_agent.string) or ('iPhone' in request.user_agent.string):
+    resource = 'mobile/' + resource
+
   url = s3.url(recording.bucket, resource, 60*5)
   return jsonify(
     result=True,
