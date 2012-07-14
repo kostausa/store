@@ -468,8 +468,9 @@ def focus(conf, id):
   return jsonify(
     result=True,
     owned=owned,    
-    id=recording.id,
+    id=recording.id,    
     thumbnail=thumburl,
+    thumbdefault=thumbdefault,
     title=recording.title,
     speaker=recording.speaker,
     ppt=recording.ppt,
