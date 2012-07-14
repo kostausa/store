@@ -458,10 +458,10 @@ def focus(conf, id):
   ios = isios(request)
 
   thumburl = '/static/img/thumb.jpg'
-  if ios:
-    thumburl = '/static/img/thumb@2x.jpg'
+  thumbdefault = True
 
   if recording.ppt != '':
+    thumbdefault = False
     thumburl = '/static/img/thumbnail/' + conference['path'] + \
       '/' + recording.filename.strip().replace('.mp3','.png')
 

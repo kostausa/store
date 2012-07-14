@@ -284,6 +284,11 @@ Store.purchase = (function() {
         data.note = false;
       }
 
+      data.thumbwidth = 120;
+      if (!data.thumbdefault) {
+        data.thumbwidth = 200;
+      }
+      
       data.ios = Store.context.ios;
 
       var _m = Hogan.compile($('#_template-modal').html());            
@@ -371,7 +376,7 @@ Store.purchase = (function() {
 </div>
 <div class="modal-body">
 
-  <img src="{{thumbnail}}" class="thumb" style="width:120px;">
+  <img src="{{thumbnail}}" class="thumb" style="width:{{thumbwidth}}px;">
 
   {{#paragraphs}}
     <p>{{.}}</p>
