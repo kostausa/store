@@ -336,7 +336,11 @@ def url(conf,material,id):
 
   targetid = int(id)
 
-  if not credit['unlimited']:
+  recording = Recording.query.filter_by(id=targetid).first()
+  if recording is None:
+    return jsonify(result=False)
+
+  if not credit['unlimited'] and not recording.categoryid == 6:
     instance = History.query \
       .filter_by(userid=user.id) \
       .filter_by(recordingid=targetid) \
@@ -344,10 +348,6 @@ def url(conf,material,id):
 
     if instance is None:
       return jsonify(result=False)
-
-  recording = Recording.query.filter_by(id=targetid).first()
-  if recording is None:
-    return jsonify(result=False)
 
   resource = recording.filename
   if material == 'slide' and recording.ppt != '':
