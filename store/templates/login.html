@@ -5,7 +5,7 @@
 {% block body %}
 
 <div class="conf">
-  {{ conf.name }} Conference
+  {{ conf.name }} Conference {{ip}}
 </div>
 
   <div class="row-fluid well">
@@ -14,6 +14,16 @@
 
       <div style="margin-bottom:20px;">
         <div>2012 KOSTA/USA 온라인 스토어에 오신 것을 환영합니다</div>
+        {% if error %}
+        <div class="alert alert-danger">
+          {% if reason == 'toomany' %}
+            현재 사용하시는 아이디로 10곳 이상의 장소에서 접속한 기록이 있어 계정을 Suspend 하였습니다. 
+            <div style="margin-top:10px;">store@kostausa.org 로 문의주시기 바랍니다. </div>
+          {% else %}
+            로그인 정보를 찾을 수 없었습니다. 
+          {% endif %}
+        </div>
+        {% endif %}
       </div>
 
       <form class="form-horizontal" action="/store/{{conf.path}}/login" method="POST">

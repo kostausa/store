@@ -19,7 +19,17 @@ class User(db.Model):
     self.name = name
     self.email = email
     self.password = password
-    self.conf = conf
+
+class Ip(db.Model):
+  id = db.Column(db.Integer, primary_key=True)
+  ipaddr = db.Column(db.String(255), unique=False)
+  userid = db.Column(db.Integer)
+  visitat = db.Column(db.DateTime)
+
+  def __init__(self, ipaddr, userid):
+    self.ipaddr = ipaddr
+    self.userid = userid
+    self.visitat = datetime.datetime.now()
 
 class Code(db.Model):
   id = db.Column(db.Integer, primary_key=True)
@@ -211,9 +221,6 @@ def adminlogin():
 
   return render_template("admin/login.html", autherror=True)
 
-
-
-
 @app.route("/store/<conf>/newmember", methods=['GET', 'POST'])
 def newmember(conf):
   conference = makeconf(conf)
@@ -282,6 +289,7 @@ def logout(conf):
 
 @app.route("/store/<conf>/login", methods=['POST'])
 def login(conf):
+
   conference = makeconf(conf)
   email = request.form['email']
   password = request.form['pass']
@@ -291,9 +299,28 @@ def login(conf):
     .filter_by(conf=conference['code']).first()
 
   if user is None:
-    return render_template('login.html', conf=conference, error=True)
+    return render_template('login.html', conf=conference, error=True, reason='auth')
+
+  locations = Ip.query.filter_by(userid=user.id).count()
+  if locations > 10:
+    return render_template('login.html', conf=conference, error=True, reason='toomany')
 
   session['user'] = user
+
+  ipaddr = request.remote_addr
+  userid = user.id
+
+  checkip = Ip.query \
+    .filter_by(ipaddr=ipaddr) \
+    .filter_by(userid=userid) \
+    .first()
+
+  if checkip is None:
+    ip = Ip(ipaddr, userid)
+    
+    db.session.add(ip)
+    db.session.flush()
+
   return redirect(url_for('main', conf=conf))
 
 @app.route("/store/<conf>/download/<material>/<id>")
