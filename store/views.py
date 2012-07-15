@@ -19,6 +19,7 @@ class User(db.Model):
     self.name = name
     self.email = email
     self.password = password
+    self.conf = conf
 
 class Ip(db.Model):
   id = db.Column(db.Integer, primary_key=True)
