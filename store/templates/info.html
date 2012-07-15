@@ -17,6 +17,16 @@
   <li><a href="/store/{{conf.path}}/points">포인트 충전/관리</a></li>
   <li class="active"><a href="/store/{{conf.path}}/info">질문/연락</a></li>
 </ul>
+
+Links
+<ul class="nav nav-tabs nav-stacked">
+  {% if conf.code is even %}
+    <li><a href="/store/indy">인디 스토어</a></li>
+  {% else %}
+    <li><a href="/store/chicago">시카고 스토어</a></li>
+  {% endif %}
+  <li><a href="http://kostausa.org/support/">코스타 후원하기</a></li>    
+</ul>
 {% endblock %}
 
 {% block body %}

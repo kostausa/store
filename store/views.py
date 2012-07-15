@@ -384,7 +384,9 @@ def main(conf):
     .filter_by(conf=conference['code']).filter_by(categoryid=2).all()
   recordings['jj'] = Recording.query \
     .filter_by(conf=conference['code']).filter_by(categoryid=4).all()
-
+  recordings['music'] = Recording.query \
+    .filter_by(conf=conference['code']).filter_by(categoryid=6).all()
+  
   # chicago has more sections
   if conference['code'] == 0:
     recordings['testimony'] = Recording.query \

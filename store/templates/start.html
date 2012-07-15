@@ -20,12 +20,14 @@
   <li><a href="/store/{{conf.path}}/info">질문/연락</a></li>
 </ul>
 
+Links
 <ul class="nav nav-tabs nav-stacked">
   {% if conf.code is even %}
-    <li><a href="/store/indy">인디애나폴리스</a></li>
+    <li><a href="/store/indy">인디 스토어</a></li>
   {% else %}
-    <li><a href="/store/chicago">시카고</a></li>
+    <li><a href="/store/chicago">시카고 스토어</a></li>
   {% endif %}
+  <li><a href="http://kostausa.org/support/">코스타 후원하기</a></li>    
 </ul>
 {% endblock %}
 
@@ -199,6 +201,34 @@
 </tbody>
 </table>
 </div>
+
+<div class="listing">
+<h3>주제곡</h3>
+<table class="table table-condensed table-striped">
+<tbody>
+{% for recording in recordings.music %}
+  <tr>
+    <td>
+      <a href="#" data-target="{{recording.id}}" class="buy title">{{recording.title}}</a> 
+
+    </td>
+    <td style="width:150px;">
+      {{ recording.speaker }}
+    </td>
+    <td style="width:130px;text-align:right;" id="opt{{recording.id}}">
+        <div class="options">
+          {% if recording.note != '': %}
+          <button class="btn btn-mini note" data-loading-text="Music" data-material="note" data-id="{{recording.id}}">Music</button>
+          {% endif %}
+          <button class="btn btn-mini btn-primary mp3" data-loading-text="MP3" data-material="mp3" data-id="{{recording.id}}">MP3</button>    
+        </div>
+    </td>
+  </tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+
 
 <div class="modal hide" id="purchase"></div>
 
