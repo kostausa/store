@@ -149,11 +149,13 @@ def update(id):
   if recording is None:
     return redirect("/store/admin")
 
+  title = request.form['title']
   ppt = request.form['ppt']
   note = request.form['note']
   filename = request.form['filename']
   description = request.form['description']
 
+  recording.title = title
   recording.ppt = ppt
   recording.note = note
   recording.filename = filename

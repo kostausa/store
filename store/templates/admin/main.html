@@ -74,6 +74,7 @@
     <a href="#{{ recording.id }}" class="detail recordtitle">{{ recording.title }} - {{ recording.speaker }}</a>
     <div class="hide" id="desc{{recording.id}}" style="margin-top:5px;">
     <form action="/store/admin/update/{{recording.id}}" method="POST">
+      <input type="text" name="title" style="width:95%;" placeholder="제목" value="{{ recording.title }}">
       <input type="text" name="filename" style="width:95%;" placeholder="녹음파일" value="{{ recording.filename }}">
       <input type="text" name="ppt" style="width:95%;" placeholder="PPT 파일" value="{{ recording.ppt }}">
       <input type="text" name="note" style="width:95%;" placeholder="Note 파일" value="{{ recording.note }}">      
