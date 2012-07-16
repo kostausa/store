@@ -262,13 +262,14 @@ def swipe():
 
   stripe.api_key = app.config['STRIPE_API_KEY']
   token = request.form['stripeToken']
+  description = "KOSTA/USA " + conference['name'] + " Store - " + request.form['name']
 
   try:
     charge = stripe.Charge.create(
       amount=amount,
       currency="usd",
       card=token,
-      description="KOSTA Online Store"
+      description=description
     )
   except Exception:
     return render_template('swipe.html', conf=conference, result=False)
