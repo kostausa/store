@@ -395,6 +395,8 @@ def main(conf):
       .filter_by(conf=conference['code']).filter_by(categoryid=3).all()
     recordings['theme'] = Recording.query \
       .filter_by(conf=conference['code']).filter_by(categoryid=5).all()
+    recordings['journey'] = Recording.query \
+      .filter_by(conf=conference['code']).filter_by(categoryid=7).all()
 
   history = History.query \
     .filter_by(userid=user.id) \
