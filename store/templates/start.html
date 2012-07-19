@@ -290,6 +290,36 @@ Links
 
 {% endif %}
 
+<div class="listing">
+<h3>성경공부</h3>
+<table class="table table-condensed table-striped">
+<tbody>
+{% for recording in recordings.study %}
+  <tr>
+    <td>
+      <a href="#" data-target="{{recording.id}}" class="buy title">{{recording.title}}</a> 
+
+    </td>
+    <td style="width:150px;">
+      {{ recording.speaker }}
+    </td>
+    <td style="width:130px;text-align:right;" id="opt{{recording.id}}">
+      {% if credit.unlimited or recording.id in owned %}
+        <div class="options">
+          <button class="btn btn-mini btn-primary mp3" data-loading-text="Booklet" data-material="mp3" data-id="{{recording.id}}">Booklet</button>    
+        </div>
+      {% else %}      
+      <span class="preview">
+        <i class="icon-file"></i>
+      </span>
+      <button data-target="{{recording.id}}" class="buy btn btn-mini"><i class="icon-search"></i></button>
+      {% endif %}
+    </td>
+  </tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
 
 <div class="listing">
 <h3>주제곡</h3>
@@ -511,13 +541,21 @@ Store.purchase = (function() {
 
   <div style="text-align:right;">
 
+    {{^isstudy}}
     <span class="label label-info"><i class="icon-headphones icon-white"></i> MP3</span>
+    {{/isstudy}}
+    
     {{#ppt}}
       <span class="label label-info"><i class="icon-picture icon-white"></i> 슬라이드 PDF</span>
     {{/ppt}}
+    
     {{#note}}
       <span class="label label-info"><i class="icon-file icon-white"></i> 강의안 PDF</span>
     {{/note}}
+
+    {{#isstudy}}
+    <span class="label label-info"><i class="icon-file icon-white"></i> 교재 Booklet</span>
+    {{/isstudy}}
     
     <div style="margin-top:15px;">
       가격: 1 포인트

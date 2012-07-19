@@ -389,6 +389,8 @@ def main(conf):
     .filter_by(conf=conference['code']).filter_by(categoryid=4).all()
   recordings['music'] = Recording.query \
     .filter_by(conf=conference['code']).filter_by(categoryid=6).all()
+  recordings['study'] = Recording.query \
+    .filter_by(conf=conference['code']).filter_by(categoryid=8).all()
   
   # chicago has more sections
   if conference['code'] == 0:
@@ -495,10 +497,15 @@ def focus(conf, id):
   thumburl = '/static/img/thumb.jpg'
   thumbdefault = True
 
-  if recording.ppt != '':
+  isstudy = False
+  if recording.categoryid == 8:
+    isstudy = True
+
+  if isstudy or recording.ppt != '':
     thumbdefault = False
+    filepart = recording.filename.strip().split('.')    
     thumburl = '/static/img/thumbnail/' + conference['path'] + \
-      '/' + recording.filename.strip().replace('.mp3','.png')
+      '/' + filepart[0] + '.png'
 
   return jsonify(
     result=True,
@@ -510,6 +517,7 @@ def focus(conf, id):
     speaker=recording.speaker,
     ppt=recording.ppt,
     note=recording.note,
+    isstudy=isstudy,
     description=paragraphs
   )
 
