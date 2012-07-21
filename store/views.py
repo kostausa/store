@@ -8,6 +8,8 @@ from flask import render_template
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import func
 
+from werkzeug.security import generate_password_hash, check_password_hash
+
 class User(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   name = db.Column(db.String(255), unique=False)
@@ -18,7 +20,7 @@ class User(db.Model):
   def __init__(self, name, email, password, conf):
     self.name = name
     self.email = email
-    self.password = password
+    self.password = generate_password_hash(password)
     self.conf = conf
 
 class Ip(db.Model):
@@ -297,12 +299,15 @@ def login(conf):
   conference = makeconf(conf)
   email = request.form['email']
   password = request.form['pass']
+
   user = User.query \
     .filter_by(email=email) \
-    .filter_by(password=password) \
     .filter_by(conf=conference['code']).first()
 
   if user is None:
+    return render_template('login.html', conf=conference, error=True, reason='auth')
+
+  if not check_password_hash(user.password, password):
     return render_template('login.html', conf=conference, error=True, reason='auth')
 
   locations = Ip.query.filter_by(userid=user.id).count()
