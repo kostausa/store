@@ -4,16 +4,12 @@
 
 {% block body %}
 
-<div class="conf">
-  {{ conf.name }} Conference {{ip}}
-</div>
-
   <div class="row-fluid well">
 
     <div class="span6">
 
       <div style="margin-bottom:20px;">
-        <div>2012 KOSTA/USA 온라인 스토어에 오신 것을 환영합니다</div>
+        <div>KOSTA/USA 온라인 스토어에 오신 것을 환영합니다</div>
         {% if error %}
         <div class="alert alert-danger">
           {% if reason == 'toomany' %}
@@ -26,7 +22,7 @@
         {% endif %}
       </div>
 
-      <form class="form-horizontal" action="/store/{{conf.path}}/login" method="POST">
+      <form class="form-horizontal" action="/store/login" method="POST">
 
         <div class="control-group">
           <label class="control-label" for="email">이메일</label>
@@ -47,18 +43,14 @@
         </div>
 
         <div class="newmember pull-right">
-          <a href="/store/{{conf.path}}/newmember">아직 계정이 없습니다 &mdash; 가입하기</a>
+          <a href="/store/newmember">아직 계정이 없습니다 &mdash; 가입하기</a>
         </div>
 
       </form>
 
     </div>
     <div class="span6">
-      <a href="http://kostausa.org"><img src="/static/img/poster.jpg" style="width:330px;" class="pull-right" border="0"></a>
-    </div>
-
-    <div style="color:#777">
-    <i class="icon-map-marker"></i> <i><a href="/store/chicago">시카고</a>와 <a href="/store/indy">인디애나폴리스</a> 컨퍼런스는 계정을 따로 만드셔야 합니다.</i>
+      <a href="http://kostausa.org"><img src="/static/img/poster-2013.jpg" style="width:330px;" class="pull-right" border="0"></a>
     </div>
 
   </div>

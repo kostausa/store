@@ -15,339 +15,114 @@
 </div>
       
 <ul class="nav nav-tabs nav-stacked">
-  <li class="active"><a href="/store/{{conf.path}}">강의/설교 리스트</a></li>
-  <li ><a href="/store/{{conf.path}}/points">포인트 충전/관리</a></li>
-  <li><a href="/store/{{conf.path}}/info">질문/연락</a></li>
+  <li class="active"><a href="/store">강의/설교 리스트</a></li>
+  <li ><a href="/store/points">포인트 충전/관리</a></li>
+  <li><a href="/store/info">질문/연락</a></li>
 </ul>
 
 Links
 <ul class="nav nav-tabs nav-stacked">
-  {% if conf.code is even %}
-    <li><a href="/store/indy">인디 스토어</a></li>
-  {% else %}
-    <li><a href="/store/chicago">시카고 스토어</a></li>
-  {% endif %}
   <li><a href="http://kostausa.org/support/">코스타 후원하기</a></li>    
 </ul>
 {% endblock %}
 
 {% block body %}
 
-<div style="margin-bottom:50px;">
-  <div class="conf">
-    {{ conf.name }} Conference
+<ul class="nav nav-tabs">
+  <li class="active">
+    <a href="#chicago" data-toggle="tab">Chicago</a>
+  </li>
+  <li><a href="#indianapolis" data-toggle="tab">Indianapolis</a></li>
+</ul>
+
+<div class="tab-content">
+
+{% for conf in inventory %}
+<div class="tab-pane{% if conf == 'chicago' %} active{% endif %}" id="{{conf}}">
+
+
+<div style="margin-bottom:20px;">
+
+
+  <table cellpadding="3" cellspacing="0" width="100%">
+  <tr>
+    <td style="width:250px;">
+      <div class="conf">    
+        {{ conf | capitalize }} Conference
+      </div>
+    </td>
+    <td>
+      <ul class="nav nav-pills select-year">
+        <li class="active">
+          <a href="#" data-conf="{{conf}}" data-year="2013">2013</a>
+        </li>
+        <li>
+          <a href="#" data-conf="{{conf}}" data-year="2012">2012</a>
+        </li>    
+      </ul>
+    </td>
+  </tr>
+  </table>
+
+  <div style="text-align:right;">
+    {{user.name}} {{user.email}} | <a href="/store/logout">logout</a>
   </div>
 
-  <div class="pull-right">
-    {{user.name}} {{user.email}} | <a href="/store/{{conf.path}}/logout">logout</a>
+
+</div>
+
+<div class="listing">
+{% for year in inventory[conf] %}
+
+  <div class="year-pane y{{year}}{% if not year == currentyear %} hide{% endif %}">
+
+  {% for category in inventory[conf][year].keys() %}
+
+    <h3>{{categories[category]}}</h3>
+    <table class="table table-condensed table-striped">
+    <tbody>
+    {% for recording in inventory[conf][year][category] %}
+      <tr>
+        <td>
+          <a href="#" data-target="{{recording.id}}" class="buy title">{{recording.title}}</a> 
+
+        </td>
+        <td style="width:150px;">
+          {{ recording.speaker }}
+        </td>
+        <td style="width:130px;text-align:right;" id="opt{{recording.id}}">
+          {% if credit.unlimited or recording.id in owned %}
+            <div class="options">
+              {% if recording.ppt != '': %}          
+              <button class="btn btn-mini btn-info slide"  data-loading-text="Slide" data-material="slide" data-id="{{recording.id}}">Slide</button>
+              {% endif %}
+              <button class="btn btn-mini btn-primary mp3" data-loading-text="MP3" data-material="mp3" data-id="{{recording.id}}">MP3</button>    
+            </div>
+          {% else %}
+          <span class="preview">
+            {% if recording.ppt != '' %}
+            <i class="icon-picture"></i>
+            {% endif %}
+            <i class="icon-headphones"></i>
+          </span>
+          <button data-target="{{recording.id}}" class="buy btn btn-mini"><i class="icon-search"></i></button>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+
+  {% endfor %}
   </div>
-</div>
 
-<div class="listing">
-<h3>전체집회</h3>
-<table class="table table-condensed table-striped">
-<tbody>
-{% for recording in recordings.message %}
-  <tr>
-    <td>
-      <a href="#" data-target="{{recording.id}}" class="buy title">{{recording.title}}</a> 
-
-    </td>
-    <td style="width:150px;">
-      {{ recording.speaker }}
-    </td>
-    <td style="width:130px;text-align:right;" id="opt{{recording.id}}">
-      {% if credit.unlimited or recording.id in owned %}
-        <div class="options">
-          {% if recording.ppt != '': %}          
-          <button class="btn btn-mini btn-info slide"  data-loading-text="Slide" data-material="slide" data-id="{{recording.id}}">Slide</button>
-          {% endif %}
-          <button class="btn btn-mini btn-primary mp3" data-loading-text="MP3" data-material="mp3" data-id="{{recording.id}}">MP3</button>    
-        </div>
-      {% else %}
-      <span class="preview">
-        {% if recording.ppt != '' %}
-        <i class="icon-picture"></i>
-        {% endif %}
-        <i class="icon-headphones"></i>
-      </span>
-      <button data-target="{{recording.id}}" class="buy btn btn-mini"><i class="icon-search"></i></button>
-      {% endif %}
-    </td>
-  </tr>
 {% endfor %}
-</tbody>
-</table>
 </div>
 
-{% if conf.code is even %}
-<div class="listing">
-<h3>간증</h3>
-<table class="table table-condensed table-striped">
-<tbody>
-{% for recording in recordings.testimony %}
-  <tr>
-    <td>
-      <a href="#" data-target="{{recording.id}}" class="buy title">{{recording.title}}</a> 
+</div>
 
-    </td>
-    <td style="width:150px;">
-      {{ recording.speaker }}
-    </td>
-    <td style="width:130px;text-align:right;" id="opt{{recording.id}}">
-      {% if credit.unlimited or recording.id in owned %}
-        <div class="options">
-          {% if recording.ppt != '': %}          
-          <button class="btn btn-mini btn-info slide"  data-loading-text="Slide" data-material="slide" data-id="{{recording.id}}">Slide</button>
-          {% endif %}
-          <button class="btn btn-mini btn-primary mp3" data-loading-text="MP3" data-material="mp3" data-id="{{recording.id}}">MP3</button>    
-        </div>
-      {% else %}
-      <span class="preview">
-        {% if recording.ppt != '' %}
-        <i class="icon-picture"></i>
-        {% endif %}
-        <i class="icon-headphones"></i>
-      </span>
-      <button data-target="{{recording.id}}" class="buy btn btn-mini"><i class="icon-search"></i></button>
-      {% endif %}
-    </td>
-  </tr>
 {% endfor %}
-</tbody>
-</table>
 </div>
-{% endif %}
-
-<div class="listing">
-<h3>조장수양회 - jjKOSTA</h3>
-<table class="table table-condensed table-striped">
-<tbody>
-{% for recording in recordings.jj %}
-  <tr>
-    <td>
-      <a href="#" data-target="{{recording.id}}" class="buy title">{{recording.title}}</a> 
-
-    </td>
-    <td style="width:150px;">
-      {{ recording.speaker }}
-    </td>
-    <td style="width:130px;text-align:right;" id="opt{{recording.id}}">
-      {% if credit.unlimited or recording.id in owned %}
-        <div class="options">
-          {% if recording.ppt != '': %}
-          <button class="btn btn-mini btn-info slide" data-loading-text="Slide" data-material="slide" data-id="{{recording.id}}">Slide</button>
-          {% endif %}
-          <button class="btn btn-mini btn-primary mp3" data-loading-text="MP3" data-material="mp3" data-id="{{recording.id}}">MP3</button>    
-        </div>
-      {% else %}      
-      <span class="preview">
-        {% if recording.ppt != '' %}
-        <i class="icon-picture"></i>
-        {% endif %}
-        <i class="icon-headphones"></i>
-      </span>
-      <button data-target="{{recording.id}}" class="buy btn btn-mini"><i class="icon-search"></i></button>
-      {% endif %}
-    </td>
-  </tr>
-{% endfor %}
-</tbody>
-</table>
-</div>
-
-<div class="listing">
-<h3>선택식 세미나</h3>
-<table class="table table-condensed table-striped">
-<tbody>
-{% for recording in recordings.seminar %}
-  <tr>
-    <td>
-      <a href="#" data-target="{{recording.id}}" class="buy title">{{recording.title}}</a> 
-
-    </td>
-    <td style="width:150px;">
-      {{ recording.speaker }}
-    </td>
-    <td style="width:130px;text-align:right;" id="opt{{recording.id}}">
-      {% if credit.unlimited or recording.id in owned %}
-        <div class="options">
-          {% if recording.note != '': %}          
-          <button class="btn btn-mini note" data-loading-text="Note" data-material="note" data-id="{{recording.id}}">Note</button>
-          {% endif %}
-          {% if recording.ppt != '': %}          
-          <button class="btn btn-mini btn-info slide" data-loading-text="Slide" data-material="slide" data-id="{{recording.id}}">Slide</button>
-          {% endif %}
-          <button class="btn btn-mini btn-primary mp3" data-loading-text="MP3" data-material="mp3" data-id="{{recording.id}}">MP3</button>    
-        </div>
-      {% else %}      
-      <span class="preview">
-        {% if recording.note != '' %}
-        <i class="icon-file"></i>
-        {% endif %}
-        {% if recording.ppt != '' %}
-        <i class="icon-picture"></i>
-        {% endif %}
-        <i class="icon-headphones"></i>
-      </span>
-      <button data-target="{{recording.id}}" class="buy btn btn-mini"><i class="icon-search"></i></button>
-      {% endif %}
-    </td>
-  </tr>
-{% endfor %}
-</tbody>
-</table>
-</div>
-
-{% if conf.code is even %}
-
-<div class="listing">
-<h3>주제트랙</h3>
-<table class="table table-condensed table-striped">
-<tbody>
-{% for recording in recordings.theme %}
-  <tr>
-    <td>
-      <a href="#" data-target="{{recording.id}}" class="buy title">{{recording.title}}</a> 
-
-    </td>
-    <td style="width:150px;">
-      {{ recording.speaker }}
-    </td>
-    <td style="width:130px;text-align:right;" id="opt{{recording.id}}">
-      {% if credit.unlimited or recording.id in owned %}
-        <div class="options">
-          {% if recording.note != '': %}          
-          <button class="btn btn-mini note" data-loading-text="Note" data-material="note" data-id="{{recording.id}}">Note</button>
-          {% endif %}
-          {% if recording.ppt != '': %}          
-          <button class="btn btn-mini btn-info slide" data-loading-text="Slide" data-material="slide" data-id="{{recording.id}}">Slide</button>
-          {% endif %}
-          <button class="btn btn-mini btn-primary mp3" data-loading-text="MP3" data-material="mp3" data-id="{{recording.id}}">MP3</button>    
-        </div>
-      {% else %}      
-      <span class="preview">
-        {% if recording.note != '' %}
-        <i class="icon-file"></i>
-        {% endif %}
-        {% if recording.ppt != '' %}
-        <i class="icon-picture"></i>
-        {% endif %}
-        <i class="icon-headphones"></i>
-      </span>
-      <button data-target="{{recording.id}}" class="buy btn btn-mini"><i class="icon-search"></i></button>
-      {% endif %}
-    </td>
-  </tr>
-{% endfor %}
-</tbody>
-</table>
-</div>
-
-
-<div class="listing">
-<h3>Journey 트랙</h3>
-<table class="table table-condensed table-striped">
-<tbody>
-{% for recording in recordings.journey %}
-  <tr>
-    <td>
-      <a href="#" data-target="{{recording.id}}" class="buy title">{{recording.title}}</a> 
-
-    </td>
-    <td style="width:150px;">
-      {{ recording.speaker }}
-    </td>
-    <td style="width:130px;text-align:right;" id="opt{{recording.id}}">
-      {% if credit.unlimited or recording.id in owned %}
-        <div class="options">
-          {% if recording.note != '': %}          
-          <button class="btn btn-mini note" data-loading-text="Note" data-material="note" data-id="{{recording.id}}">Note</button>
-          {% endif %}
-          {% if recording.ppt != '': %}          
-          <button class="btn btn-mini btn-info slide" data-loading-text="Slide" data-material="slide" data-id="{{recording.id}}">Slide</button>
-          {% endif %}
-          <button class="btn btn-mini btn-primary mp3" data-loading-text="MP3" data-material="mp3" data-id="{{recording.id}}">MP3</button>    
-        </div>
-      {% else %}      
-      <span class="preview">
-        {% if recording.note != '' %}
-        <i class="icon-file"></i>
-        {% endif %}
-        {% if recording.ppt != '' %}
-        <i class="icon-picture"></i>
-        {% endif %}
-        <i class="icon-headphones"></i>
-      </span>
-      <button data-target="{{recording.id}}" class="buy btn btn-mini"><i class="icon-search"></i></button>
-      {% endif %}
-    </td>
-  </tr>
-{% endfor %}
-</tbody>
-</table>
-</div>
-
-{% endif %}
-
-<div class="listing">
-<h3>성경공부</h3>
-<table class="table table-condensed table-striped">
-<tbody>
-{% for recording in recordings.study %}
-  <tr>
-    <td>
-      <a href="#" data-target="{{recording.id}}" class="buy title">{{recording.title}}</a> 
-
-    </td>
-    <td style="width:150px;">
-      {{ recording.speaker }}
-    </td>
-    <td style="width:130px;text-align:right;" id="opt{{recording.id}}">
-      {% if credit.unlimited or recording.id in owned %}
-        <div class="options">
-          <button class="btn btn-mini btn-primary mp3" data-loading-text="Booklet" data-material="mp3" data-id="{{recording.id}}">Booklet</button>    
-        </div>
-      {% else %}      
-      <span class="preview">
-        <i class="icon-file"></i>
-      </span>
-      <button data-target="{{recording.id}}" class="buy btn btn-mini"><i class="icon-search"></i></button>
-      {% endif %}
-    </td>
-  </tr>
-{% endfor %}
-</tbody>
-</table>
-</div>
-
-<div class="listing">
-<h3>주제곡</h3>
-<table class="table table-condensed table-striped">
-<tbody>
-{% for recording in recordings.music %}
-  <tr>
-    <td>
-      <a href="#" data-target="{{recording.id}}" class="buy title">{{recording.title}}</a> 
-
-    </td>
-    <td style="width:150px;">
-      {{ recording.speaker }}
-    </td>
-    <td style="width:130px;text-align:right;" id="opt{{recording.id}}">
-        <div class="options">
-          {% if recording.note != '': %}
-          <button class="btn btn-mini note" data-loading-text="Music" data-material="note" data-id="{{recording.id}}">Music</button>
-          {% endif %}
-          <button class="btn btn-mini btn-primary mp3" data-loading-text="MP3" data-material="mp3" data-id="{{recording.id}}">MP3</button>    
-        </div>
-    </td>
-  </tr>
-{% endfor %}
-</tbody>
-</table>
-</div>
-
 
 <div class="modal hide" id="purchase"></div>
 
@@ -365,7 +140,7 @@ Store.purchase = (function() {
   var recording = {
     "detail": function(id) {
       $.ajax({
-        "url" : '/store/{{conf.path}}/focus/'+id,
+        "url" : '/store/focus/'+id,
         "dataType": 'json',
         "success": modalbox.view,
         "error": function(data) {
@@ -459,7 +234,7 @@ Store.purchase = (function() {
     "submit": function(id) {
       $.ajax({
         "type": 'POST',
-        "url" : '/store/{{conf.path}}/buy/'+id,
+        "url" : '/store/buy/'+id,
         "dataType": 'json',
         "success": recording.update,
         "error": function(data) {
@@ -480,7 +255,7 @@ Store.purchase = (function() {
       var _self = this;
 
       $.ajax({
-        "url" : '/store/{{conf.path}}/download/'+material+'/'+id,
+        "url" : '/store/download/'+material+'/'+id,
         "dataType": 'json',
         "success": function(data) {
           _self.delayreset(e.currentTarget);
@@ -517,6 +292,21 @@ Store.purchase = (function() {
         var id = $(e.currentTarget).data('id');
         var material = $(e.currentTarget).data('material');
         s3.download(id, material, e);
+      });
+
+      $('.select-year').on('click', 'a', function(e) {
+        
+        var year = $(this).data('year');
+        var conf = $(this).data('conf');
+
+        $('#'+conf+' .year-pane').hide();
+        $('#'+conf+' .y'+year).show();
+
+        $('#'+conf+' .select-year li').removeClass("active");
+        $(this).parent().addClass("active");
+
+        e.preventDefault();
+
       });
 
     }

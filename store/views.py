@@ -66,6 +66,7 @@ class Recording(db.Model):
   title = db.Column(db.Text, unique=True)
   speaker = db.Column(db.String(255), unique=False)
   conf = db.Column(db.Integer)
+  year = db.Column(db.Integer)
   ppt = db.Column(db.String(255))
   note = db.Column(db.String(255))
   description = db.Column(db.Text)
@@ -108,12 +109,8 @@ def makeconf(conf):
 
   return conference
 
-def auth(conf):
+def auth():
   if 'user' in session and not session['user'] is None:
-    user = session['user']
-    if user.conf != conf['code']:
-      return False
-
     return True
   else: 
     return False
@@ -293,26 +290,24 @@ def logout(conf):
   del session['user'] 
   return redirect('/store/' + conf) 
 
-@app.route("/store/<conf>/login", methods=['POST'])
-def login(conf):
+@app.route("/store/login", methods=['POST'])
+def login():
 
-  conference = makeconf(conf)
   email = request.form['email']
   password = request.form['pass']
 
   user = User.query \
-    .filter_by(email=email) \
-    .filter_by(conf=conference['code']).first()
+    .filter_by(email=email).first()
 
   if user is None:
-    return render_template('login.html', conf=conference, error=True, reason='auth')
+    return render_template('login.html', error=True, reason='auth')
 
   if not check_password_hash(user.password, password):
-    return render_template('login.html', conf=conference, error=True, reason='auth')
+    return render_template('login.html', error=True, reason='auth')
 
   locations = Ip.query.filter_by(userid=user.id).count()
   if locations > 10:
-    return render_template('login.html', conf=conference, error=True, reason='toomany')
+    return render_template('login.html', error=True, reason='toomany')
 
   session['user'] = user
 
@@ -330,7 +325,7 @@ def login(conf):
     db.session.add(ip)
     db.session.flush()
 
-  return redirect(url_for('main', conf=conf))
+  return redirect(url_for('main'))
 
 @app.route("/store/<conf>/download/<material>/<id>")
 def url(conf,material,id):
@@ -373,38 +368,61 @@ def url(conf,material,id):
     url=url
   )
 
-
-# the three main sections
-@app.route("/store/<conf>")
-def main(conf):
-  conference = makeconf(conf)
-  if not auth(conference):
-    return render_template('login.html', conf=conference)
+@app.route("/store")
+def main():
+  if not auth():
+    return render_template('login.html')
 
   user = session['user']
   logs = get_logs(user)
   credit = get_credit(logs)
 
+
+  allrecordings = Recording.query.order_by(Recording.conf).order_by(Recording.categoryid).all()
+
+  inventory = {
+    'chicago' : {},
+    'indianapolis' : {}
+  }
+
+  for recording in allrecordings:
+    conf = 'chicago'
+    if recording.conf == 1:
+      conf = 'indianapolis'
+
+    year = recording.year
+    if not year in inventory[conf]:
+      inventory[conf][year] = {}
+
+    category = recording.categoryid
+    if not category in inventory[conf][year]:
+      inventory[conf][year][category] = []
+
+    inventory[conf][year][category].append(recording)
+
+  categories = {}
+  allcategories = Category.query.all()
+  for category in allcategories:
+    categories[category.id] = category.description
+
   recordings = {}
   recordings['message'] = Recording.query \
-    .filter_by(conf=conference['code']).filter_by(categoryid=1).all()
+    .filter_by(categoryid=1).all()
   recordings['seminar'] = Recording.query \
-    .filter_by(conf=conference['code']).filter_by(categoryid=2).all()
+    .filter_by(categoryid=2).all()
   recordings['jj'] = Recording.query \
-    .filter_by(conf=conference['code']).filter_by(categoryid=4).all()
+    .filter_by(categoryid=4).all()
   recordings['music'] = Recording.query \
-    .filter_by(conf=conference['code']).filter_by(categoryid=6).all()
+    .filter_by(categoryid=6).all()
   recordings['study'] = Recording.query \
-    .filter_by(conf=conference['code']).filter_by(categoryid=8).all()
+    .filter_by(categoryid=8).all()
   
-  # chicago has more sections
-  if conference['code'] == 0:
-    recordings['testimony'] = Recording.query \
-      .filter_by(conf=conference['code']).filter_by(categoryid=3).all()
-    recordings['theme'] = Recording.query \
-      .filter_by(conf=conference['code']).filter_by(categoryid=5).all()
-    recordings['journey'] = Recording.query \
-      .filter_by(conf=conference['code']).filter_by(categoryid=7).all()
+  recordings['testimony'] = Recording.query \
+    .filter_by(categoryid=3).all()
+  recordings['theme'] = Recording.query \
+    .filter_by(categoryid=5).all()
+  recordings['journey'] = Recording.query \
+    .filter_by(categoryid=7).all()
 
   history = History.query \
     .filter_by(userid=user.id) \
@@ -417,8 +435,10 @@ def main(conf):
 
   ios = isios(request)
 
-  return render_template('start.html', conf=conference, credit=credit, 
-    user=user, recordings=recordings, owned=owned, ios=ios)
+  return render_template('start.html', credit=credit, 
+    user=user, recordings=recordings, inventory=inventory, 
+    owned=owned, ios=ios, categories=categories,
+    currentyear=app.config['YEAR'])
 
 @app.route("/store/<conf>/buy/<id>", methods=['POST'])
 def buy(conf, id):
