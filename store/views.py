@@ -15,13 +15,11 @@ class User(db.Model):
   name = db.Column(db.String(255), unique=False)
   email = db.Column(db.String(255), unique=True)
   password = db.Column(db.String(255), unique=False)
-  conf = db.Column(db.Integer)
   
-  def __init__(self, name, email, password, conf):
+  def __init__(self, name, email, password):
     self.name = name
     self.email = email
     self.password = generate_password_hash(password)
-    self.conf = conf
 
 class Ip(db.Model):
   id = db.Column(db.Integer, primary_key=True)
@@ -72,7 +70,7 @@ class Recording(db.Model):
   description = db.Column(db.Text)
   categoryid = db.Column(db.Integer, db.ForeignKey('category.id'))
 
-  def __init__(self, bucket, filename, title, speaker, conf, ppt, recordtype, description, note):
+  def __init__(self, bucket, filename, title, speaker, conf, ppt, recordtype, description, note, year):
     self.bucket = bucket
     self.filename = filename
     self.title = title
@@ -82,6 +80,7 @@ class Recording(db.Model):
     self.note = note
     self.description = description
     self.categoryid = recordtype
+    self.year = year
 
 class Category(db.Model):
   id = db.Column(db.Integer, primary_key=True)
@@ -192,12 +191,13 @@ def add_recording():
   desc = request.form['desc']
   conf = int(request.form['conf'])
   description = request.form['desc']
-  
-  bucket = '2012-chicago'
-  if conf == 1:
-    bucket = '2012-indy'
+  year = app.config['YEAR']
 
-  recording = Recording(bucket, filename, title, speaker, conf, ppt, recordtype, description, note)
+  bucket = str(year) + '-chicago'
+  if conf == 1:
+    bucket = str(year) + '-indy'
+
+  recording = Recording(bucket, filename, title, speaker, conf, ppt, recordtype, description, note, year)
   db.session.add(recording)
   db.session.commit()
 
@@ -223,28 +223,27 @@ def adminlogin():
 
   return render_template("admin/login.html", autherror=True)
 
-@app.route("/store/<conf>/newmember", methods=['GET', 'POST'])
-def newmember(conf):
-  conference = makeconf(conf)
+@app.route("/store/newmember", methods=['GET', 'POST'])
+def newmember():
   if request.method == 'GET':
-    return render_template('newmember.html', conf=conference)
+    return render_template('newmember.html')
   else:
     email = request.form['email']
     name = request.form['name']
     password = request.form['pass']
 
-    user = User.query.filter_by(email=email).filter_by(conf=conference['code']).first()
+    user = User.query.filter_by(email=email).first()
     if not user is None:
       return render_template('newmember.html', 
-        conf=conference, error=True, reason='exists', email=email)
+        error=True, reason='exists', email=email)
 
-    user = User(name, email, password, conference['code'])
+    user = User(name, email, password)
 
     db.session.add(user)
     db.session.commit()
 
     session['user'] = user
-    return render_template('newmember.html', conf=conference, user=user, done=True)
+    return render_template('newmember.html', user=user, done=True)
 
 @app.route("/store/checkout/<points>")
 def checkout(points):

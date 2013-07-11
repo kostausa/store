@@ -5,7 +5,7 @@
 {% block body %}
 
 <div class="conf">
-  {{ conf.name }} Conference
+  KOSTA/USA Store
 </div>
 
 {% if error %}
@@ -19,7 +19,7 @@
     {% endif %}
   </div>
 </div>
-<a href="/store/{{conf.path}}/newmember" class="btn">돌아가기</a>
+<a href="/store/newmember" class="btn">돌아가기</a>
 {% elif done %}
 <div class="row-fluid">
   <div class="alert alert-success span5">
@@ -29,10 +29,9 @@
     </div>
   </div>
 </div>
-<a href="/store/{{conf.path}}" class="btn">온라인 스토어에 들어가기</a>
+<a href="/store" class="btn">온라인 스토어에 들어가기</a>
 {% else %}
 <form class="form-horizontal" id="newmember-form" action="newmember" method="POST">
-  <input type="hidden" name="confcode" value="{{conf.code}}">
   <fieldset>
     <legend>
       <div style="color:#269;">
@@ -69,7 +68,7 @@
 
     <div class="form-actions">
       <button type="submit" class="btn btn-primary">신청하기</button>
-      <a href="/store/{{conf.path}}" class="btn">Cancel</a>      
+      <a href="/store" class="btn">Cancel</a>      
     </div>
 
   </fieldset>
