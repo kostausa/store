@@ -43,27 +43,6 @@ Links
 
 <div style="margin-bottom:20px;">
 
-
-  <table cellpadding="3" cellspacing="0" width="100%">
-  <tr>
-    <td style="width:250px;">
-      <div class="conf">    
-        {{ conf | capitalize }} Conference
-      </div>
-    </td>
-    <td>
-      <ul class="nav nav-pills select-year">
-        <li class="active">
-          <a href="#" data-conf="{{conf}}" data-year="2013">2013</a>
-        </li>
-        <li>
-          <a href="#" data-conf="{{conf}}" data-year="2012">2012</a>
-        </li>    
-      </ul>
-    </td>
-  </tr>
-  </table>
-
   <div style="text-align:right;">
     {{user.name}} {{user.email}} | <a href="/store/logout">logout</a>
   </div>
@@ -93,16 +72,28 @@ Links
         <td style="width:130px;text-align:right;" id="opt{{recording.id}}">
           {% if credit.unlimited or recording.id in owned %}
             <div class="options">
+              
               {% if recording.ppt != '': %}          
               <button class="btn btn-mini btn-info slide"  data-loading-text="Slide" data-material="slide" data-id="{{recording.id}}">Slide</button>
               {% endif %}
+
+              {% if recording.note != '': %}
+              <button class="btn btn-mini btn-info note" data-loading-text="Note" data-material="note" data-id="{{recording.id}}">Note</button>
+              {% endif %}
+              
               <button class="btn btn-mini btn-primary mp3" data-loading-text="MP3" data-material="mp3" data-id="{{recording.id}}">MP3</button>    
             </div>
           {% else %}
           <span class="preview">
+            
             {% if recording.ppt != '' %}
             <i class="icon-picture"></i>
             {% endif %}
+
+            {% if recording.note != '' %}
+            <i class="icon-file"></i>
+            {% endif %}
+            
             <i class="icon-headphones"></i>
           </span>
           <button data-target="{{recording.id}}" class="buy btn btn-mini"><i class="icon-search"></i></button>
@@ -292,21 +283,6 @@ Store.purchase = (function() {
         var id = $(e.currentTarget).data('id');
         var material = $(e.currentTarget).data('material');
         s3.download(id, material, e);
-      });
-
-      $('.select-year').on('click', 'a', function(e) {
-        
-        var year = $(this).data('year');
-        var conf = $(this).data('conf');
-
-        $('#'+conf+' .year-pane').hide();
-        $('#'+conf+' .y'+year).show();
-
-        $('#'+conf+' .select-year li').removeClass("active");
-        $(this).parent().addClass("active");
-
-        e.preventDefault();
-
       });
 
     }

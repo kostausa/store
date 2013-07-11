@@ -246,22 +246,20 @@ def newmember(conf):
     session['user'] = user
     return render_template('newmember.html', conf=conference, user=user, done=True)
 
-@app.route("/store/<conf>/checkout/<points>")
-def checkout(conf, points):
-  conference = makeconf(conf)  
-  return render_template('checkout.html', conf=conference, amount=points)
+@app.route("/store/checkout/<points>")
+def checkout(points):
+  return render_template('checkout.html', amount=points)
 
 @app.route("/store/swipe", methods=['POST'])
 def swipe():
   amount = int(request.form['amount'])
-  conference = makeconf(request.form['conf'])
 
-  if not auth(conference):
-    return render_template('login.html', conf=conference)
+  if not auth():
+    return render_template('login.html')
 
   stripe.api_key = app.config['STRIPE_API_KEY']
   token = request.form['stripeToken']
-  description = "KOSTA/USA " + conference['name'] + " Store - " + request.form['name']
+  description = "KOSTA/USA Store - " + request.form['name']
 
   try:
     charge = stripe.Charge.create(
@@ -270,8 +268,8 @@ def swipe():
       card=token,
       description=description
     )
-  except Exception:
-    return render_template('swipe.html', conf=conference, result=False)
+  except stripe.CardError, e:
+    return render_template('swipe.html', result=False)
 
   usd = charge.amount / 100
   ts = datetime.datetime.fromtimestamp(charge.created).strftime('%Y-%m-%d %H:%M:%S')
@@ -282,13 +280,12 @@ def swipe():
   db.session.add(history)
   db.session.commit()
 
-  return render_template('swipe.html', conf=conference, amount=usd, ts=ts, id=charge.id, charge=charge, result=True)
+  return render_template('swipe.html', amount=usd, ts=ts, id=charge.id, charge=charge, result=True)
 
-@app.route("/store/<conf>/logout")
-def logout(conf):
-  conference = makeconf(conf)
+@app.route("/store/logout")
+def logout():
   del session['user'] 
-  return redirect('/store/' + conf) 
+  return redirect('/store') 
 
 @app.route("/store/login", methods=['POST'])
 def login():
@@ -327,11 +324,10 @@ def login():
 
   return redirect(url_for('main'))
 
-@app.route("/store/<conf>/download/<material>/<id>")
-def url(conf,material,id):
-  conference = makeconf(conf)
-  if not auth(conference):
-    return render_template('login.html', conf=conference)
+@app.route("/store/download/<material>/<id>")
+def url(material,id):
+  if not auth():
+    return render_template('login.html')
 
   user = session['user']
   logs = get_logs(user)
@@ -405,25 +401,6 @@ def main():
   for category in allcategories:
     categories[category.id] = category.description
 
-  recordings = {}
-  recordings['message'] = Recording.query \
-    .filter_by(categoryid=1).all()
-  recordings['seminar'] = Recording.query \
-    .filter_by(categoryid=2).all()
-  recordings['jj'] = Recording.query \
-    .filter_by(categoryid=4).all()
-  recordings['music'] = Recording.query \
-    .filter_by(categoryid=6).all()
-  recordings['study'] = Recording.query \
-    .filter_by(categoryid=8).all()
-  
-  recordings['testimony'] = Recording.query \
-    .filter_by(categoryid=3).all()
-  recordings['theme'] = Recording.query \
-    .filter_by(categoryid=5).all()
-  recordings['journey'] = Recording.query \
-    .filter_by(categoryid=7).all()
-
   history = History.query \
     .filter_by(userid=user.id) \
     .filter_by(type='purchase') \
@@ -436,14 +413,13 @@ def main():
   ios = isios(request)
 
   return render_template('start.html', credit=credit, 
-    user=user, recordings=recordings, inventory=inventory, 
+    user=user, inventory=inventory, 
     owned=owned, ios=ios, categories=categories,
     currentyear=app.config['YEAR'])
 
-@app.route("/store/<conf>/buy/<id>", methods=['POST'])
-def buy(conf, id):
-  conference = makeconf(conf)
-  if not auth(conference):
+@app.route("/store/buy/<id>", methods=['POST'])
+def buy(id):
+  if not auth():
     return jsonify(result=False, reason='auth')
 
   targetid = int(id)
@@ -488,10 +464,9 @@ def buy(conf, id):
   return jsonify(result=True, id=targetid, note=note, ppt=ppt, total=total, unlimited=credit['unlimited'])
 
     
-@app.route("/store/<conf>/focus/<id>")
-def focus(conf, id):
-  conference = makeconf(conf)
-  if not auth(conference):
+@app.route("/store/focus/<id>")
+def focus(id):
+  if not auth():
     return jsonify(result=False)
 
   user = session['user']
@@ -526,10 +501,14 @@ def focus(conf, id):
   if recording.categoryid == 8:
     isstudy = True
 
+  conf = 'chicago'
+  if recording.conf == 1:
+    conf = 'indy'
+
   if isstudy or recording.ppt != '':
     thumbdefault = False
     filepart = recording.filename.strip().split('.')    
-    thumburl = '/static/img/thumbnail/' + conference['path'] + \
+    thumburl = '/static/img/thumbnail/' + conf + \
       '/' + filepart[0] + '.png'
 
   return jsonify(
@@ -588,22 +567,22 @@ def get_logs(user):
     .all() 
   return logs
 
-def render_points(conf, error=False):
-  conference = makeconf(conf)
-  if not auth(conference):
-    return render_template('login.html', conf=conference)
+def render_points(error=False):
+  if not auth():
+    return render_template('login.html')
 
   user = session['user']  
   logs = get_logs(user)
   credit = get_credit(logs)
   choices = get_choices(credit)
 
-  return render_template('points.html', conf=conference, 
-    user=user, logs=logs, error=error, credit=credit, choices=choices)  
+  return render_template('points.html', 
+    user=user, logs=logs, error=error, 
+    credit=credit, choices=choices)  
 
-@app.route("/store/<conf>/points")
-def points(conf):
-  return render_points(conf)
+@app.route("/store/points")
+def points():
+  return render_points()
 
 @app.route("/store/<conf>/redeem", methods=['POST'])
 def redeem(conf):
@@ -640,14 +619,13 @@ def redeem(conf):
 
   return render_points(conf, codeerror)
 
-@app.route("/store/<conf>/info")
-def info(conf):
-  conference = makeconf(conf)
-  if not auth(conference):
-    return render_template('login.html', conf=conference)
+@app.route("/store/info")
+def info():
+  if not auth():
+    return render_template('login.html')
 
   user = session['user']
   logs = get_logs(user)
   credit = get_credit(logs)
 
-  return render_template('info.html', conf=conference, user=user, credit=credit)
+  return render_template('info.html', user=user, credit=credit)

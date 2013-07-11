@@ -13,30 +13,21 @@
 </div>
 
 <ul class="nav nav-tabs nav-stacked">
-  <li><a href="/store/{{conf.path}}">강의/설교 리스트</a></li>
-  <li class="active"><a href="/store/{{conf.path}}/points">포인트 충전/관리</a></li>
-  <li><a href="/store/{{conf.path}}/info">질문/연락</a></li>
+  <li><a href="/store">강의/설교 리스트</a></li>
+  <li class="active"><a href="/store/points">포인트 충전/관리</a></li>
+  <li><a href="/store/info">질문/연락</a></li>
 </ul>
 
 Links
 <ul class="nav nav-tabs nav-stacked">
-  {% if conf.code is even %}
-    <li><a href="/store/indy">인디 스토어</a></li>
-  {% else %}
-    <li><a href="/store/chicago">시카고 스토어</a></li>
-  {% endif %}
   <li><a href="http://kostausa.org/support/">코스타 후원하기</a></li>    
 </ul>
 {% endblock %}
 
 {% block body %}
 
-<div class="conf">
-  {{ conf.name }} Conference
-</div>
-
 <div class="pull-right">
-  {{user.name}} {{user.email}} | <a href="/store/{{conf.path}}/logout">logout</a>
+  {{user.name}} {{user.email}} | <a href="/store/logout">logout</a>
 </div>
 
 <div class="inner">
@@ -102,7 +93,7 @@ Links
         <td>{{ option }} Point</td>
         <td>${{ option }}</td>
         <td>{{ option }}개 다운로드</td>
-        <td><a href="/store/{{conf.path}}/checkout/{{option}}" class="btn btn-mini btn-info">${{ option }} - Buy</a></td>
+        <td><a href="/store/checkout/{{option}}" class="btn btn-mini btn-info">${{ option }} - Buy</a></td>
       </tr>
     {% endfor %}
 
@@ -111,7 +102,7 @@ Links
         <td>{{ choices.fullupgrade }} Point</td>
         <td>${{ choices.fullupgrade }}</td>
         <td>무제한 다운로드로 전환하기</td>
-        <td><a href="/store/{{conf.path}}/checkout/{{ choices.fullupgrade }}" class="btn btn-mini btn-success">${{ choices.fullupgrade }} - 무제한 다운로드로 전환</a></td>
+        <td><a href="/store/checkout/{{ choices.fullupgrade }}" class="btn btn-mini btn-success">${{ choices.fullupgrade }} - 무제한 다운로드로 전환</a></td>
       </tr>
     {% endif %}
     </tbody>
@@ -140,7 +131,7 @@ Links
   {% if choices.fullupgrade == 0 %}
   무제한 다운로드 하실 수 있습니다. 선물카드 적용이 더 필요하지 않습니다. 
   {% else %}
-  <form class="form-horizontal" method="POST" action="/store/{{conf.path}}/redeem">
+  <form class="form-horizontal" method="POST" action="/store/redeem">
     <input type="text" class="input-mini" maxlength="4" name="giftcode1"> &mdash;
     <input type="text" class="input-mini" name="giftcode2"> &mdash;
     <input type="text" class="input-mini" name="giftcode3"> &mdash;

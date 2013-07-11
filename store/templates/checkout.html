@@ -4,17 +4,13 @@
 
 {% block menu %}
 <ul class="nav nav-tabs nav-stacked">
-  <li><a href="/store/{{conf.path}}">강의/설교 리스트</a></li>
-  <li><a href="/store/{{conf.path}}/points">포인트 충전/관리</a></li>
-  <li><a href="/store/{{conf.path}}/info">질문/연락</a></li>
+  <li><a href="/store">강의/설교 리스트</a></li>
+  <li><a href="/store/points">포인트 충전/관리</a></li>
+  <li><a href="/store/info">질문/연락</a></li>
 </ul>
 {% endblock %}
 
 {% block body %}
-
-<div class="conf">
-  {{ conf.name }} Conference
-</div>
 
 <div style="margin-top:30px;padding-left:20px;">
 
@@ -26,7 +22,6 @@
   <div class="span5">
 
     <form action="/store/swipe" method="POST" id="payment-form">
-      <input type="hidden" name="conf" value="{{conf.path}}">
       <input type="hidden" name="amount" value="{{amount}}00">
       <input type="hidden" id="stripeToken" name="stripeToken" value="">
        <div class="form-row">
@@ -96,7 +91,7 @@
 {% endblock %}
 
 {% block js %}
-<script type="text/javascript" src="https://js.stripe.com/v1/"></script>
+<script type="text/javascript" src="https://js.stripe.com/v2/"></script>
 <script type="text/javascript">
   var Store = {};
   Store.checkout = (function() {
@@ -137,7 +132,7 @@
 
         $('button[type=submit]').button('loading');
 
-        Stripe.createToken({
+        Stripe.card.createToken({
           number: $('.card-number').val(),
           cvc: $('.card-cvc').val(),
           exp_month: $('.card-expiry-month').val(),
@@ -181,7 +176,9 @@
 
     return {
       "setup" : function() {
-        Stripe.setPublishableKey('pk_hArwmOdy9cXxZtd0xsU5fr4ZE40yz');
+
+        Stripe.setPublishableKey('pk_QW1ledt2oHZGEL9i0b1HJzLeeQ5B1');
+        //Stripe.setPublishableKey('pk_hArwmOdy9cXxZtd0xsU5fr4ZE40yz');
 
         $('.cvc').click(function() {
           $('#cvcdesc').fadeToggle('fast');
