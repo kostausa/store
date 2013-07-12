@@ -4,6 +4,15 @@
 
 {% block body %}
 
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=192784600743421";
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));</script>
+
   <div class="row-fluid well">
 
     <div class="span6">
@@ -46,6 +55,19 @@
           <a href="/store/newmember">아직 계정이 없습니다 &mdash; 가입하기</a>
         </div>
 
+        <!-- twitter button -->
+        <div style="margin-top:250px;">
+
+          <a href="https://twitter.com/share" class="twitter-share-button" data-url="https://kostausa.org/store" data-text="2013 KOSTA/USA 온라인 스토어 -" data-via="kostausa" data-lang="en">Tweet</a>
+          <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+        </div>
+
+        <!-- fb like button -->
+        <div style="margin-top:10px">
+          <div class="fb-like" data-href="https://kostausa.org/store" data-send="true" data-width="400" data-show-faces="true"></div>
+        </div>
+        
       </form>
 
     </div>
