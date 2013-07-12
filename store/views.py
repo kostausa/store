@@ -36,7 +36,6 @@ class Code(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   code = db.Column(db.String(255), unique=False)
   credit = db.Column(db.Integer)
-  conf = db.Column(db.Integer)
   userid = db.Column(db.Integer)
 
 class History(db.Model):
@@ -584,11 +583,10 @@ def render_points(error=False):
 def points():
   return render_points()
 
-@app.route("/store/<conf>/redeem", methods=['POST'])
-def redeem(conf):
-  conference = makeconf(conf)
-  if not auth(conference):
-    return render_template('login.html', conf=conference)
+@app.route("/store/redeem", methods=['POST'])
+def redeem():
+  if not auth():
+    return render_template('login.html')
 
   user = session['user']
   giftcode = request.form['giftcode1'] + '-' + \
@@ -597,7 +595,6 @@ def redeem(conf):
     request.form['giftcode4']
 
   code = Code.query \
-    .filter_by(conf=conference['code']) \
     .filter_by(code=giftcode) \
     .first()
 
@@ -617,7 +614,7 @@ def redeem(conf):
     db.session.add(history)
     db.session.commit()
 
-  return render_points(conf, codeerror)
+  return render_points(codeerror)
 
 @app.route("/store/info")
 def info():
