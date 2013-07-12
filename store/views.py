@@ -247,7 +247,8 @@ def newmember():
 
 @app.route("/store/checkout/<points>")
 def checkout(points):
-  return render_template('checkout.html', amount=points)
+  pubkey = app.config['STRIPE_PUBLISHABLE_KEY']
+  return render_template('checkout.html', pubkey=pubkey, amount=points)
 
 @app.route("/store/swipe", methods=['POST'])
 def swipe():
