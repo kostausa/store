@@ -487,8 +487,12 @@ def focus(id):
     .filter_by(recordingid=targetid) \
     .first()
 
+  isfree = False
+  if recording.categoryid == 6:
+    isfree = True
+
   owned = False
-  if credit['unlimited'] or not log is None:
+  if isfree or credit['unlimited'] or not log is None:
     owned = True
 
   ios = isios(request)
@@ -515,6 +519,7 @@ def focus(id):
   return jsonify(
     result=True,
     owned=owned,    
+    isfree=isfree,
     id=recording.id,    
     thumbnail=thumburl,
     thumbdefault=thumbdefault,
