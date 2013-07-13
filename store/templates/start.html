@@ -76,7 +76,7 @@ Links
           {{ recording.speaker }}
         </td>
         <td style="width:130px;text-align:right;" id="opt{{recording.id}}">
-          {% if credit.unlimited or recording.id in owned %}
+          {% if category == 6 or credit.unlimited or recording.id in owned %}
             <div class="options">
               
               {% if recording.ppt != '': %}          
