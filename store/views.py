@@ -216,7 +216,7 @@ def adminlogin():
   user = request.form["user"]
   passwd = request.form["pass"]
 
-  if user == "store" and passwd == "gkskslaskfk":
+  if user == "store" and passwd == app.config['ADMINPASS']:
     session['admin'] = True
     return redirect("/store/admin")
 
