@@ -504,11 +504,13 @@ def focus(id):
   if recording.conf == 1:
     conf = 'indy'
 
+  currentyear = recording.year
+
   if isstudy or recording.ppt != '':
     thumbdefault = False
     filepart = recording.filename.strip().split('.')    
     thumburl = '/static/img/thumbnail/' + conf + \
-      '/' + filepart[0] + '.png'
+      '/' + str(currentyear) + '/' + filepart[0] + '.png'
 
   return jsonify(
     result=True,
