@@ -669,6 +669,7 @@ def profile_change():
   db.session.add(user)
   db.session.commit()
 
+  session['user'] = user;
   return render_template('profile.html', change=True, user=user, credit=credit)
 
 
