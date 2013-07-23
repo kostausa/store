@@ -623,6 +623,55 @@ def redeem():
 
   return render_points(codeerror)
 
+@app.route("/store/profile")
+def profile():
+  if not auth():
+    return render_template('login.html')
+
+  user = session['user']
+  logs = get_logs(user)
+  credit = get_credit(logs)
+
+  return render_template('profile.html', user=user, credit=credit)
+
+@app.route("/store/profile", methods=['POST'])
+def profile_change():
+  if not auth():
+    return render_template('login.html')
+
+  user = session['user']
+  if user is None:
+    return render_template('login.html', error=True, reason='auth')
+
+  logs = get_logs(user)
+  credit = get_credit(logs)
+
+  email = user.email
+  password = request.form['currentPass']
+  newpass = request.form['newPass']
+  repeat = request.form['repeatPass']
+
+  if not check_password_hash(user.password, password):
+    return render_template('profile.html', user=user, credit=credit, 
+      error=True, reason='current')
+
+  if not newpass == repeat:
+    return render_template('profile.html', user=user, credit=credit,
+      error=True, reason='repeat')
+
+  if len(newpass) < 3:
+    return render_template('profile.html', user=user, credit=credit,
+      error=True, reason='short')
+
+  passhash = generate_password_hash(newpass)  
+  user.password = passhash
+
+  db.session.add(user)
+  db.session.commit()
+
+  return render_template('profile.html', change=True, user=user, credit=credit)
+
+
 @app.route("/store/info")
 def info():
   if not auth():

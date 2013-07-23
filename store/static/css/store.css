@@ -186,6 +186,18 @@ a.bl {
   margin-top:50px;
 }
 
+.form-actions .error
+{
+  color:#c00;  
+  margin-bottom:10px;
+}
+
+.form-actions .success
+{
+  color:#0a0;
+  margin-bottom:10px;
+}
+
 ul.social {
   margin-top:40px;
   text-align:right;

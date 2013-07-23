@@ -1,0 +1,110 @@
+{% extends 'layout.html' %}
+{% block css %}
+{% endblock %}
+
+{% block menu %}
+<div class="remains">
+  <i class="icon-signal"></i> 
+  {% if credit.unlimited %}
+  무제한
+  {% else %}
+  {{ credit.total }} 포인트
+  {% endif %}
+</div>
+
+<ul class="nav nav-tabs nav-stacked">
+  <li><a href="/store">강의/설교 리스트</a></li>
+  <li><a href="/store/points">포인트 충전/관리</a></li>
+  <li><a href="/store/info">질문/연락</a></li>
+  <li class="active"><a href="/store/profile">패스워드 변경</a></li>  
+</ul>
+
+Links
+<ul class="nav nav-tabs nav-stacked">
+  <li><a href="http://kostausa.org/support/">코스타 후원하기</a></li>    
+</ul>
+
+<div id="social">
+  <a href="http://twitter.com/kostausa"><img src="/static/img/twitter.png" alt="twitter logo" style="width:50px" border="0"></a>
+  <a href="http://facebook.com/kostausa"><img src="/static/img/fb.png" alt="facebook logo" style="width:30px" border="0"></a>
+</div>
+
+
+{% endblock %}
+
+{% block body %}
+
+<div class="pull-right">
+  {{user.name}} {{user.email}} | <a href="/store/logout">logout</a>
+</div>
+
+<div class="help well">
+
+<div class="conf">패스워드 변경</div>
+<div style="margin-bottom:45px;padding-bottom:15px;">모든 패스워드는 암호화되어 저장됩니다</div>
+
+<form class="form-horizontal" action="/store/profile" method="POST">
+  <div class="control-group">
+    <label class="control-label" for="currentPass">Current Password</label>
+    <div class="controls">
+      <input type="password" id="currentPass" name="currentPass" placeholder="Current Password">
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="newPass">New Password</label>
+    <div class="controls">
+      <input type="password" id="newPass" name="newPass" placeholder="New Password">
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="repeatPass">Confirm</label>
+    <div class="controls">
+      <input type="password" id="repeatPass" name="repeatPass" placeholder="Confirm Above">
+    </div>
+  </div>
+  <div class="form-actions">
+    {% if error %}
+    <div class="msg error">
+      {% if reason == 'current' %}
+        입력하신 현재 패스워드가 올바르지 않습니다.
+      {% elif reason == 'repeat' %}
+        재입력하신 패스워드가 일치하지 않습니다.
+      {% elif reason == 'short' %}
+        새로운 패스워드가 너무 짧습니다
+      {% endif %}
+    </div>
+    {% elif change %}
+    <div class="msg success">
+      패스워드가 변경되었습니다
+    </div>
+    {% endif %}
+
+    <button type="submit" class="btn btn-primary">변경합니다</button>
+    <button type="button" class="btn">취소</button>
+  </div>
+</form>
+
+</div>
+
+<script type="text/javascript">
+var Store = {};
+Store.profile = (function() {
+  return {
+    "setup" : function()
+    {
+      var status = $('.form-actions .msg');
+      if (status.length > 0)
+      {
+        setTimeout(function() {
+          status.slideUp('fast');
+        }, 3000);
+      }
+    }
+  }
+})();
+</script>
+{% endblock %}
+
+{% block setupjs %}
+Store.profile.setup();
+{% endblock %}
