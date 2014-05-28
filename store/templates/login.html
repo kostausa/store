@@ -18,14 +18,17 @@
     <div class="span6">
 
       <div style="margin-bottom:20px;">
-        <div>2013 KOSTA/USA 온라인 스토어에 오신 것을 환영합니다</div>
+        <div>
+          2013 KOSTA/USA 온라인 스토어에 오신 것을 환영합니다.<br>
+          05/31/2014 부터 2013 스토어는 닫을 예정입니다. 필요하신 다운로드를 미리 마쳐주시길 부탁드립니다.
+        </div>
         {% if error %}
         <div class="alert alert-danger">
           {% if reason == 'toomany' %}
-            현재 사용하시는 아이디로 10곳 이상의 장소에서 접속한 기록이 있어 계정을 Suspend 하였습니다. 
+            현재 사용하시는 아이디로 10곳 이상의 장소에서 접속한 기록이 있어 계정을 Suspend 하였습니다.
             <div style="margin-top:10px;">store@kostausa.org 로 문의주시기 바랍니다. </div>
           {% else %}
-            로그인 정보를 찾을 수 없었습니다. 
+            로그인 정보를 찾을 수 없었습니다.
           {% endif %}
         </div>
         {% endif %}
@@ -47,7 +50,7 @@
           </div>
         </div>
 
-        <div class="control-group">          
+        <div class="control-group">
           <button type="submit" class="btn btn-info btn-large pull-right">로그인</button>
         </div>
 
@@ -67,7 +70,7 @@
         <div style="margin-top:10px">
           <div class="fb-like" data-href="https://kostausa.org/store" data-send="true" data-width="400" data-show-faces="true"></div>
         </div>
-        
+
       </form>
 
     </div>
