@@ -15,7 +15,7 @@ class User(db.Model):
   name = db.Column(db.String(255), unique=False)
   email = db.Column(db.String(255), unique=True)
   password = db.Column(db.String(255), unique=False)
-  
+
   def __init__(self, name, email, password):
     self.name = name
     self.email = email
@@ -87,7 +87,7 @@ class Category(db.Model):
   recording = db.relationship('Recording', backref='category')
 
 def isios(req):
-  # if from ios, do not trigger download but stream the files instead. 
+  # if from ios, do not trigger download but stream the files instead.
   if ('iPad' in req.user_agent.string) or ('iPhone' in req.user_agent.string):
     return True
   return False
@@ -110,7 +110,7 @@ def makeconf(conf):
 def auth():
   if 'user' in session and not session['user'] is None:
     return True
-  else: 
+  else:
     return False
 
 
@@ -124,7 +124,7 @@ def authadmin():
 def admin():
   if not authadmin():
     return redirect("/store/admin/login")
-  
+
   if not 'conf' in session:
     session['conf'] = 0
 
@@ -161,7 +161,7 @@ def update(id):
   db.session.add(recording)
   db.session.commit()
 
-  return redirect("/store/admin")  
+  return redirect("/store/admin")
 
 @app.route("/store/admin/remove", methods=["POST"])
 def remove_recording():
@@ -181,7 +181,7 @@ def add_recording():
   if not authadmin():
     return redirect("/store/admin/login")
 
-  recordtype = request.form['type']    
+  recordtype = request.form['type']
   title = request.form['title']
   speaker = request.form['speaker']
   filename = request.form['file']
@@ -233,7 +233,7 @@ def newmember():
 
     user = User.query.filter_by(email=email).first()
     if not user is None:
-      return render_template('newmember.html', 
+      return render_template('newmember.html',
         error=True, reason='exists', email=email)
 
     user = User(name, email, password)
@@ -274,7 +274,7 @@ def swipe():
   ts = datetime.datetime.fromtimestamp(charge.created).strftime('%Y-%m-%d %H:%M:%S')
 
   user = session['user']
-    
+
   history = History('credit', 1, usd, user.id, charge.id, 0)
   db.session.add(history)
   db.session.commit()
@@ -283,8 +283,8 @@ def swipe():
 
 @app.route("/store/logout")
 def logout():
-  del session['user'] 
-  return redirect('/store') 
+  del session['user']
+  return redirect('/store')
 
 @app.route("/store/login", methods=['POST'])
 def login():
@@ -317,7 +317,7 @@ def login():
 
   if checkip is None:
     ip = Ip(ipaddr, userid)
-    
+
     db.session.add(ip)
     db.session.flush()
 
@@ -411,8 +411,8 @@ def main():
 
   ios = isios(request)
 
-  return render_template('start.html', credit=credit, 
-    user=user, inventory=inventory, 
+  return render_template('start.html', credit=credit,
+    user=user, inventory=inventory,
     owned=owned, ios=ios, categories=categories,
     currentyear=app.config['YEAR'])
 
@@ -459,10 +459,10 @@ def buy(id):
     total = 0
   else:
     total = credit['total'] - 1;
-  
+
   return jsonify(result=True, id=targetid, note=note, ppt=ppt, total=total, unlimited=credit['unlimited'])
 
-    
+
 @app.route("/store/focus/<id>")
 def focus(id):
   if not auth():
@@ -497,7 +497,7 @@ def focus(id):
 
   ios = isios(request)
 
-  thumburl = '/static/img/thumb.jpg'
+  thumburl = '/static/img/thumb-%s.jpg' % recording.year
   thumbdefault = True
 
   isstudy = False
@@ -512,15 +512,15 @@ def focus(id):
 
   if isstudy or recording.ppt != '':
     thumbdefault = False
-    filepart = recording.filename.strip().split('.')    
+    filepart = recording.filename.strip().split('.')
     thumburl = '/static/img/thumbnail/' + conf + \
       '/' + str(currentyear) + '/' + filepart[0] + '.png'
 
   return jsonify(
     result=True,
-    owned=owned,    
+    owned=owned,
     isfree=isfree,
-    id=recording.id,    
+    id=recording.id,
     thumbnail=thumburl,
     thumbdefault=thumbdefault,
     title=recording.title,
@@ -544,7 +544,7 @@ def get_credit(logs):
       credit['paid'] += log.point
 
   if credit['paid'] >= 25:
-    credit['unlimited'] = True 
+    credit['unlimited'] = True
 
   if credit['paid'] > 25:
     credit['paid'] = 25
@@ -570,21 +570,21 @@ def get_logs(user):
   logs = History.query \
     .filter_by(userid=user.id) \
     .order_by(History.id) \
-    .all() 
+    .all()
   return logs
 
 def render_points(error=False):
   if not auth():
     return render_template('login.html')
 
-  user = session['user']  
+  user = session['user']
   logs = get_logs(user)
   credit = get_credit(logs)
   choices = get_choices(credit)
 
-  return render_template('points.html', 
-    user=user, logs=logs, error=error, 
-    credit=credit, choices=choices)  
+  return render_template('points.html',
+    user=user, logs=logs, error=error,
+    credit=credit, choices=choices)
 
 @app.route("/store/points")
 def points():
@@ -652,7 +652,7 @@ def profile_change():
   repeat = request.form['repeatPass']
 
   if not check_password_hash(user.password, password):
-    return render_template('profile.html', user=user, credit=credit, 
+    return render_template('profile.html', user=user, credit=credit,
       error=True, reason='current')
 
   if not newpass == repeat:
@@ -663,7 +663,7 @@ def profile_change():
     return render_template('profile.html', user=user, credit=credit,
       error=True, reason='short')
 
-  passhash = generate_password_hash(newpass)  
+  passhash = generate_password_hash(newpass)
   user.password = passhash
 
   db.session.add(user)
