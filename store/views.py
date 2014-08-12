@@ -514,7 +514,7 @@ def focus(id):
     thumbdefault = False
     filepart = recording.filename.strip().split('.')
     thumburl = '/static/img/thumbnail/' + conf + \
-      '/' + str(currentyear) + '/' + filepart[0] + '.png'
+      '/' + str(currentyear) + '/' + filepart[0] + '.jpg'
 
   return jsonify(
     result=True,
