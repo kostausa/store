@@ -1,3 +1,7 @@
+.container {
+  font-family: 'helvetica neue', 'helvetica';
+}
+
 .construction, .recording a, .sub, .listing h3, a.title, .focus h1, .focus h3, .help, .modal h3
 {
   font-family:'nanumgothic','nanumgothicotf','helvetica neue','helvetica','arial';
@@ -9,7 +13,7 @@
   padding:15px;
   border-radius:10px;
   -moz-border-radius:10px;
-  -webkit-border-radius:10px;  
+  -webkit-border-radius:10px;
   background-color:#eee;
 }
 
@@ -38,7 +42,7 @@ a.charge {
   filter: alpha(opacity=30);
   -moz-opacity: 0.3;
   -khtml-opacity: 0.3;
-  opacity: 0.3;  
+  opacity: 0.3;
   padding-right:10px;
 }
 
@@ -107,7 +111,7 @@ a.charge {
   border:1px solid #ddd;
   border-radius:4px;
   -moz-border-radius:4px;
-  -webkit-border-radius:4px;  
+  -webkit-border-radius:4px;
   margin-bottom:15px;
 }
 
@@ -188,7 +192,7 @@ a.bl {
 
 .form-actions .error
 {
-  color:#c00;  
+  color:#c00;
   margin-bottom:10px;
 }
 
